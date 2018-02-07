@@ -1,11 +1,14 @@
 package net.osmand.plus.mapmarkers;
 
+import android.app.Dialog;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -27,14 +30,18 @@ import net.osmand.plus.R;
 import net.osmand.plus.activities.MapActivity;
 import net.osmand.plus.activities.TrackActivity;
 import net.osmand.plus.mapmarkers.CoordinateInputDialogFragment.OnMapMarkersSavedListener;
+import net.osmand.plus.mapmarkers.DirectionIndicationDialogFragment.DirectionIndicationFragmentListener;
 import net.osmand.plus.mapmarkers.OptionsBottomSheetDialogFragment.MarkerOptionsFragmentListener;
 import net.osmand.plus.mapmarkers.OrderByBottomSheetDialogFragment.OrderByFragmentListener;
 import net.osmand.plus.mapmarkers.SaveAsTrackBottomSheetDialogFragment.MarkerSaveAsTrackFragmentListener;
-import net.osmand.plus.mapmarkers.ShowDirectionBottomSheetDialogFragment.ShowDirectionFragmentListener;
+import net.osmand.plus.widgets.tools.BottomNavigationViewHelper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static net.osmand.plus.mapmarkers.OptionsBottomSheetDialogFragment.GROUPS_MARKERS_MENU;
+import static net.osmand.plus.mapmarkers.OptionsBottomSheetDialogFragment.HISTORY_MARKERS_MENU;
 
 public class MapMarkersDialogFragment extends android.support.v4.app.DialogFragment {
 
@@ -52,8 +59,12 @@ public class MapMarkersDialogFragment extends android.support.v4.app.DialogFragm
 
 	private Snackbar snackbar;
 	private LockableViewPager viewPager;
+	private BottomNavigationView bottomNav;
 
 	private boolean lightTheme;
+	private String groupIdToOpen;
+
+	private int statusBarColor = -1;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -64,14 +75,26 @@ public class MapMarkersDialogFragment extends android.support.v4.app.DialogFragm
 		setStyle(STYLE_NO_FRAME, themeId);
 	}
 
+	@NonNull
+	@Override
+	public Dialog onCreateDialog(Bundle savedInstanceState) {
+		Dialog dialog = new Dialog(getActivity(), getTheme()) {
+			@Override
+			public void onBackPressed() {
+				if (!dismissOptionsMenuFragment()) {
+					super.onBackPressed();
+				}
+			}
+		};
+		if (!getMyApplication().getSettings().DO_NOT_USE_ANIMATIONS.get()) {
+			dialog.getWindow().getAttributes().windowAnimations = R.style.Animations_Alpha;
+		}
+		return dialog;
+	}
+
 	@Nullable
 	@Override
 	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-		Bundle args = getArguments();
-		boolean openGroups = false;
-		if (args != null && args.getBoolean(OPEN_MAP_MARKERS_GROUPS)) {
-			openGroups = true;
-		}
 		List<Fragment> fragments = getChildFragmentManager().getFragments();
 		if (fragments != null) {
 			for (Fragment fragment : fragments) {
@@ -99,9 +122,9 @@ public class MapMarkersDialogFragment extends android.support.v4.app.DialogFragm
 		if (optionsFragment != null) {
 			((OptionsBottomSheetDialogFragment) optionsFragment).setListener(createOptionsFragmentListener());
 		}
-		Fragment showDirectionFragment = fragmentManager.findFragmentByTag(ShowDirectionBottomSheetDialogFragment.TAG);
-		if (showDirectionFragment != null) {
-			((ShowDirectionBottomSheetDialogFragment) showDirectionFragment).setListener(createShowDirectionFragmentListener());
+		Fragment directionIndicationFragment = fragmentManager.findFragmentByTag(DirectionIndicationDialogFragment.TAG);
+		if (directionIndicationFragment != null) {
+			((DirectionIndicationDialogFragment) directionIndicationFragment).setListener(createShowDirectionFragmentListener());
 		}
 		final Fragment orderByFragment = fragmentManager.findFragmentByTag(OrderByBottomSheetDialogFragment.TAG);
 		if (orderByFragment != null) {
@@ -118,12 +141,9 @@ public class MapMarkersDialogFragment extends android.support.v4.app.DialogFragm
 
 		View mainView = inflater.inflate(R.layout.fragment_map_markers_dialog, container);
 
-		Toolbar toolbar = (Toolbar) mainView.findViewById(R.id.map_markers_toolbar);
-		if (!lightTheme) {
-			toolbar.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.actionbar_dark_color));
-		}
 		setOrderByMode(getMyApplication().getSettings().MAP_MARKERS_ORDER_BY_MODE.get());
 
+		Toolbar toolbar = (Toolbar) mainView.findViewById(R.id.map_markers_toolbar);
 		toolbar.setNavigationIcon(getMyApplication().getIconsCache().getIcon(R.drawable.ic_arrow_back));
 		toolbar.setNavigationOnClickListener(new View.OnClickListener() {
 			@Override
@@ -131,36 +151,23 @@ public class MapMarkersDialogFragment extends android.support.v4.app.DialogFragm
 				dismiss();
 			}
 		});
-		final View optionsButton = mainView.findViewById(R.id.options_button);
-		optionsButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				OptionsBottomSheetDialogFragment fragment = new OptionsBottomSheetDialogFragment();
-				fragment.setUsedOnMap(false);
-				fragment.setListener(createOptionsFragmentListener());
-				Bundle args = new Bundle();
-				int pos = viewPager.getCurrentItem();
-				args.putBoolean(OptionsBottomSheetDialogFragment.SHOW_SORT_BY_ROW, pos == ACTIVE_MARKERS_POSITION);
-				args.putBoolean(OptionsBottomSheetDialogFragment.SHOW_MOVE_ALL_TO_HISTORY_ROW, pos != HISTORY_MARKERS_POSITION);
-				fragment.setArguments(args);
-				fragment.show(getChildFragmentManager(), OptionsBottomSheetDialogFragment.TAG);
-			}
-		});
 
 		viewPager = mainView.findViewById(R.id.map_markers_view_pager);
+		viewPager.setOffscreenPageLimit(3);
 		viewPager.setSwipeLocked(true);
 		final MapMarkersViewPagerAdapter adapter = new MapMarkersViewPagerAdapter(getChildFragmentManager());
 		viewPager.setAdapter(adapter);
 
-		BottomNavigationView bottomNav = mainView.findViewById(R.id.map_markers_bottom_navigation);
+		bottomNav = mainView.findViewById(R.id.map_markers_bottom_navigation);
+		BottomNavigationViewHelper.disableShiftMode(bottomNav);
 		if (!lightTheme) {
 			bottomNav.setItemIconTintList(ContextCompat.getColorStateList(getContext(), R.color.bottom_navigation_color_selector_dark));
 			bottomNav.setItemTextColor(ContextCompat.getColorStateList(getContext(), R.color.bottom_navigation_color_selector_dark));
 		}
-		if (openGroups) {
+		if (groupIdToOpen != null) {
 			activeFragment.stopLocationUpdate();
 			groupsFragment.startLocationUpdate();
-			groupsFragment.updateAdapter();
+			groupsFragment.setGroupIdToOpen(groupIdToOpen);
 			viewPager.setCurrentItem(GROUPS_POSITION, false);
 		}
 		bottomNav.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -168,44 +175,76 @@ public class MapMarkersDialogFragment extends android.support.v4.app.DialogFragm
 			public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
 				switch (menuItem.getItemId()) {
 					case R.id.action_active:
-						activeFragment.startLocationUpdate();
-						groupsFragment.stopLocationUpdate();
-						if (viewPager.getCurrentItem() != ACTIVE_MARKERS_POSITION) {
-							hideSnackbar();
-							activeFragment.updateAdapter();
-							historyFragment.hideSnackbar();
-							groupsFragment.hideSnackbar();
-						}
-						viewPager.setCurrentItem(ACTIVE_MARKERS_POSITION);
+						setupLocationUpdate(true, false);
+						setupActiveFragment(ACTIVE_MARKERS_POSITION);
 						return true;
 					case R.id.action_groups:
-						activeFragment.stopLocationUpdate();
-						groupsFragment.startLocationUpdate();
-						if (viewPager.getCurrentItem() != GROUPS_POSITION) {
-							hideSnackbar();
-							groupsFragment.updateAdapter();
-							activeFragment.hideSnackbar();
-							historyFragment.hideSnackbar();
-						}
-						viewPager.setCurrentItem(GROUPS_POSITION);
+						setupLocationUpdate(false, true);
+						setupActiveFragment(GROUPS_POSITION);
 						return true;
 					case R.id.action_history:
-						activeFragment.stopLocationUpdate();
-						groupsFragment.stopLocationUpdate();
-						if (viewPager.getCurrentItem() != HISTORY_MARKERS_POSITION) {
-							hideSnackbar();
-							historyFragment.updateAdapter();
-							groupsFragment.hideSnackbar();
-							activeFragment.hideSnackbar();
-						}
-						viewPager.setCurrentItem(HISTORY_MARKERS_POSITION);
+						setupLocationUpdate(false, false);
+						setupActiveFragment(HISTORY_MARKERS_POSITION);
+						return true;
+					case R.id.action_more:
+						showOptionsMenuFragment();
 						return true;
 				}
 				return false;
 			}
 		});
+		bottomNav.setOnNavigationItemReselectedListener(new BottomNavigationView.OnNavigationItemReselectedListener() {
+			@Override
+			public void onNavigationItemReselected(@NonNull MenuItem menuItem) {
+				if (menuItem.getItemId() == R.id.action_more) {
+					dismissOptionsMenuFragment();
+				}
+			}
+		});
 
 		return mainView;
+	}
+
+	private void setupLocationUpdate(boolean activeFr, boolean groupsFr) {
+		if (activeFr) {
+			activeFragment.startLocationUpdate();
+		} else {
+			activeFragment.stopLocationUpdate();
+		}
+		if (groupsFr) {
+			groupsFragment.startLocationUpdate();
+		} else {
+			groupsFragment.stopLocationUpdate();
+		}
+	}
+
+	private void setupActiveFragment(int position) {
+		dismissOptionsMenuFragment();
+		if (viewPager.getCurrentItem() != position) {
+			hideSnackbar();
+			switch (position) {
+				case ACTIVE_MARKERS_POSITION:
+					activeFragment.updateAdapter();
+					groupsFragment.hideSnackbar();
+					historyFragment.hideSnackbar();
+					break;
+				case GROUPS_POSITION:
+					activeFragment.hideSnackbar();
+					groupsFragment.updateAdapter();
+					historyFragment.hideSnackbar();
+					break;
+				case HISTORY_MARKERS_POSITION:
+					activeFragment.hideSnackbar();
+					groupsFragment.hideSnackbar();
+					historyFragment.updateAdapter();
+					break;
+			}
+			viewPager.setCurrentItem(position);
+		}
+	}
+
+	private void setGroupIdToOpen(String groupIdToOpen) {
+		this.groupIdToOpen = groupIdToOpen;
 	}
 
 	private void updateAdapters() {
@@ -227,6 +266,67 @@ public class MapMarkersDialogFragment extends android.support.v4.app.DialogFragm
 		};
 	}
 
+	public void blurStatusBar() {
+		if (Build.VERSION.SDK_INT >= 21) {
+			Dialog dialog = getDialog();
+			if (dialog != null && dialog.getWindow() != null) {
+				statusBarColor = dialog.getWindow().getStatusBarColor();
+				dialog.getWindow().setStatusBarColor(ContextCompat.getColor(getActivity(),
+						lightTheme ? R.color.status_bar_dim_light : R.color.status_bar_dim_dark));
+			}
+		}
+	}
+
+	public void clearStatusBar() {
+		if (Build.VERSION.SDK_INT >= 21 && statusBarColor != -1) {
+			Dialog dialog = getDialog();
+			if (dialog != null && dialog.getWindow() != null) {
+				dialog.getWindow().setStatusBarColor(statusBarColor);
+			}
+		}
+	}
+
+	private void showOptionsMenuFragment() {
+		OptionsBottomSheetDialogFragment fragment = new OptionsBottomSheetDialogFragment();
+		fragment.setListener(createOptionsFragmentListener());
+		Bundle args = new Bundle();
+		args.putBoolean(GROUPS_MARKERS_MENU, viewPager.getCurrentItem() == GROUPS_POSITION);
+		args.putBoolean(HISTORY_MARKERS_MENU, viewPager.getCurrentItem() == HISTORY_MARKERS_POSITION);
+		fragment.setArguments(args);
+		getChildFragmentManager().beginTransaction()
+				.add(R.id.menu_container, fragment, OptionsBottomSheetDialogFragment.TAG)
+				.commitAllowingStateLoss();
+	}
+
+	private boolean dismissOptionsMenuFragment() {
+		Fragment optionsMenu = getChildFragmentManager().findFragmentByTag(OptionsBottomSheetDialogFragment.TAG);
+		if (optionsMenu != null) {
+			((DialogFragment) optionsMenu).dismiss();
+			return true;
+		}
+		return false;
+	}
+
+	private void restoreSelectedNavItem() {
+		if (bottomNav.getSelectedItemId() == R.id.action_more) {
+			int id = -1;
+			switch (viewPager.getCurrentItem()) {
+				case ACTIVE_MARKERS_POSITION:
+					id = R.id.action_active;
+					break;
+				case GROUPS_POSITION:
+					id = R.id.action_groups;
+					break;
+				case HISTORY_MARKERS_POSITION:
+					id = R.id.action_history;
+					break;
+			}
+			if (id != -1) {
+				bottomNav.getMenu().findItem(id).setChecked(true);
+			}
+		}
+	}
+
 	private MarkerOptionsFragmentListener createOptionsFragmentListener() {
 		return new MarkerOptionsFragmentListener() {
 
@@ -238,17 +338,16 @@ public class MapMarkersDialogFragment extends android.support.v4.app.DialogFragm
 					OrderByBottomSheetDialogFragment fragment = new OrderByBottomSheetDialogFragment();
 					fragment.setUsedOnMap(false);
 					fragment.setListener(createOrderByFragmentListener());
-					fragment.show(mapActivity.getSupportFragmentManager(), OrderByBottomSheetDialogFragment.TAG);
+					fragment.show(getChildFragmentManager(), OrderByBottomSheetDialogFragment.TAG);
 				}
 			}
 
 			@Override
 			public void showDirectionOnClick() {
 				if (mapActivity != null) {
-					ShowDirectionBottomSheetDialogFragment fragment = new ShowDirectionBottomSheetDialogFragment();
-					fragment.setUsedOnMap(false);
+					DirectionIndicationDialogFragment fragment = new DirectionIndicationDialogFragment();
 					fragment.setListener(createShowDirectionFragmentListener());
-					fragment.show(mapActivity.getSupportFragmentManager(), ShowDirectionBottomSheetDialogFragment.TAG);
+					fragment.show(getChildFragmentManager(), DirectionIndicationDialogFragment.TAG);
 				}
 			}
 
@@ -258,7 +357,7 @@ public class MapMarkersDialogFragment extends android.support.v4.app.DialogFragm
 					CoordinateInputDialogFragment fragment = new CoordinateInputDialogFragment();
 					fragment.setRetainInstance(true);
 					fragment.setListener(createOnMapMarkersSavedListener());
-					fragment.show(mapActivity.getSupportFragmentManager(), CoordinateInputDialogFragment.TAG);
+					fragment.show(getChildFragmentManager(), CoordinateInputDialogFragment.TAG);
 				}
 			}
 
@@ -269,7 +368,7 @@ public class MapMarkersDialogFragment extends android.support.v4.app.DialogFragm
 						Toast.makeText(mapActivity, getString(R.string.plan_route_no_markers_toast), Toast.LENGTH_SHORT).show();
 					} else {
 						PlanRouteFragment.showInstance(mapActivity);
-						dismiss();
+						MapMarkersDialogFragment.this.dismiss();
 					}
 				}
 			}
@@ -282,7 +381,7 @@ public class MapMarkersDialogFragment extends android.support.v4.app.DialogFragm
 					} else {
 						SaveAsTrackBottomSheetDialogFragment fragment = new SaveAsTrackBottomSheetDialogFragment();
 						fragment.setListener(createSaveAsTrackFragmentListener());
-						fragment.show(mapActivity.getSupportFragmentManager(), SaveAsTrackBottomSheetDialogFragment.TAG);
+						fragment.show(getChildFragmentManager(), SaveAsTrackBottomSheetDialogFragment.TAG);
 					}
 				}
 			}
@@ -316,11 +415,16 @@ public class MapMarkersDialogFragment extends android.support.v4.app.DialogFragm
 					snackbar.show();
 				}
 			}
+
+			@Override
+			public void dismiss() {
+				restoreSelectedNavItem();
+			}
 		};
 	}
 
-	private ShowDirectionFragmentListener createShowDirectionFragmentListener() {
-		return new ShowDirectionFragmentListener() {
+	private DirectionIndicationFragmentListener createShowDirectionFragmentListener() {
+		return new DirectionIndicationFragmentListener() {
 
 			final MapActivity mapActivity = getMapActivity();
 
@@ -387,20 +491,16 @@ public class MapMarkersDialogFragment extends android.support.v4.app.DialogFragm
 	}
 
 	public static boolean showInstance(@NonNull MapActivity mapActivity) {
-		return showInstance(mapActivity, false);
+		return showInstance(mapActivity, null);
 	}
 
-	public static boolean showInstance(@NonNull MapActivity mapActivity, boolean openGroups) {
+	public static boolean showInstance(@NonNull MapActivity mapActivity, String groupIdToOpen) {
 		try {
 			if (mapActivity.isActivityDestroyed()) {
 				return false;
 			}
 			MapMarkersDialogFragment fragment = new MapMarkersDialogFragment();
-			if (openGroups) {
-				Bundle args = new Bundle();
-				args.putBoolean(OPEN_MAP_MARKERS_GROUPS, true);
-				fragment.setArguments(args);
-			}
+			fragment.setGroupIdToOpen(groupIdToOpen);
 			fragment.show(mapActivity.getSupportFragmentManager(), TAG);
 			return true;
 		} catch (RuntimeException e) {

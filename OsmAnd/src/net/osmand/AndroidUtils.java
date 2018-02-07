@@ -4,13 +4,23 @@ package net.osmand;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.PointF;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.StateListDrawable;
 import android.os.Build;
 import android.os.IBinder;
+import android.support.annotation.ColorRes;
+import android.support.annotation.DrawableRes;
+import android.support.v4.content.ContextCompat;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
+import android.text.style.URLSpan;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.View;
@@ -86,6 +96,24 @@ public class AndroidUtils {
 		return src;
 	}
 
+	public static void removeLinkUnderline(TextView textView) {
+		Spannable s = new SpannableString(textView.getText());
+		for (URLSpan span : s.getSpans(0, s.length(), URLSpan.class)) {
+			int start = s.getSpanStart(span);
+			int end = s.getSpanEnd(span);
+			s.removeSpan(span);
+			span = new URLSpan(span.getURL()) {
+				@Override
+				public void updateDrawState(TextPaint ds) {
+					super.updateDrawState(ds);
+					ds.setUnderlineText(false);
+				}
+			};
+			s.setSpan(span, start, end, 0);
+		}
+		textView.setText(s);
+	}
+
 	public static String formatDate(Context ctx, long time) {
 		return DateFormat.getDateFormat(ctx).format(new Date(time));
 	}
@@ -112,6 +140,35 @@ public class AndroidUtils {
 		}
 
 		return null;
+	}
+
+	public static ColorStateList createColorStateList(Context ctx, boolean night,
+													  @ColorRes int lightNormal, @ColorRes int lightPressed,
+													  @ColorRes int darkNormal, @ColorRes int darkPressed) {
+		return new ColorStateList(
+				new int[][]{
+						new int[]{android.R.attr.state_pressed},
+						new int[]{}
+				},
+				new int[]{
+						ContextCompat.getColor(ctx, night ? darkPressed : lightPressed),
+						ContextCompat.getColor(ctx, night ? darkNormal : lightNormal)
+				}
+		);
+	}
+
+	public static StateListDrawable createStateListDrawable(Context ctx, boolean night,
+															@DrawableRes int lightNormal, @DrawableRes int lightPressed,
+															@DrawableRes int darkNormal, @DrawableRes int darkPressed) {
+		return createStateListDrawable(ContextCompat.getDrawable(ctx, night ? darkNormal : lightNormal),
+				ContextCompat.getDrawable(ctx, night ? darkPressed : lightPressed));
+	}
+
+	public static StateListDrawable createStateListDrawable(Drawable normal, Drawable pressed) {
+		StateListDrawable res = new StateListDrawable();
+		res.addState(new int[]{android.R.attr.state_pressed}, pressed);
+		res.addState(new int[]{}, normal);
+		return res;
 	}
 
 	@SuppressLint("NewApi")
@@ -177,6 +234,12 @@ public class AndroidUtils {
 		);
 	}
 
+	public static int resolveAttribute(Context ctx, int attribute) {
+		TypedValue outValue = new TypedValue();
+		ctx.getTheme().resolveAttribute(attribute, outValue, true);
+		return outValue.resourceId;
+	}
+
 	public static int getStatusBarHeight(Context ctx) {
 		int result = 0;
 		int resourceId = ctx.getResources().getIdentifier("status_bar_height", "dimen", "android");
@@ -188,7 +251,11 @@ public class AndroidUtils {
 
 	public static void addStatusBarPadding21v(Context ctx, View view) {
 		if (Build.VERSION.SDK_INT >= 21) {
-			view.setPadding(0, getStatusBarHeight(ctx), 0, 0);
+			int paddingLeft = view.getPaddingLeft();
+			int paddingTop = view.getPaddingTop();
+			int paddingRight = view.getPaddingRight();
+			int paddingBottom = view.getPaddingBottom();
+			view.setPadding(paddingLeft, paddingTop + getStatusBarHeight(ctx), paddingRight, paddingBottom);
 		}
 	}
 
@@ -282,6 +349,14 @@ public class AndroidUtils {
 		uiOptions ^= View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
 		uiOptions ^= View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
 		decorView.setSystemUiVisibility(uiOptions);
+	}
+
+	public static int[] getCenterViewCoordinates(View view) {
+		int[] coordinates = new int[2];
+		view.getLocationOnScreen(coordinates);
+		coordinates[0] += view.getWidth() / 2;
+		coordinates[1] += view.getHeight() / 2;
+		return coordinates;
 	}
 
 	public static void enterToFullScreen(Activity activity) {

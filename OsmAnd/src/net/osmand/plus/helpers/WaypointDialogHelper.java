@@ -213,7 +213,7 @@ public class WaypointDialogHelper {
 		for (Object p : points) {
 			if (p instanceof LocationPointWrapper) {
 				LocationPointWrapper w = (LocationPointWrapper) p;
-				if (w.type == WaypointHelper.TARGETS && !((TargetPoint) w.point).start) {
+				if (w.type == WaypointHelper.TARGETS) {
 					activePoints.add(p);
 				}
 			}
@@ -222,32 +222,20 @@ public class WaypointDialogHelper {
 	}
 
 	private List<Drawable> getCustomDividers(Context ctx, List<Object> points, boolean nightMode) {
-		int color;
-		int pointColor;
-		if (nightMode) {
-			color = ContextCompat.getColor(ctx, R.color.dashboard_divider_dark);
-			pointColor = ContextCompat.getColor(ctx, R.color.dashboard_divider_dark);
-		} else {
-			color = ContextCompat.getColor(ctx, R.color.dashboard_divider_light);
-			pointColor = ContextCompat.getColor(ctx, R.color.ctx_menu_info_divider_light);
-		}
+		int color = ContextCompat.getColor(ctx, nightMode
+				? R.color.dashboard_divider_dark : R.color.dashboard_divider_light);
 
 		Shape fullDividerShape = new ListDividerShape(color, 0);
 		Shape halfDividerShape = new ListDividerShape(color, AndroidUtils.dpToPx(ctx, 56f));
-		Shape halfPointDividerShape = new ListDividerShape(color, AndroidUtils.dpToPx(ctx, 56f),
-				pointColor, AndroidUtils.dpToPx(ctx, 1.5f), true);
 		Shape headerDividerShape = new ListDividerShape(color, AndroidUtils.dpToPx(ctx, 16f));
 
 		final ShapeDrawable fullDivider = new ShapeDrawable(fullDividerShape);
 		final ShapeDrawable halfDivider = new ShapeDrawable(halfDividerShape);
-		final ShapeDrawable halfPointDivider = new ShapeDrawable(halfPointDividerShape);
 		final ShapeDrawable headerDivider = new ShapeDrawable(headerDividerShape);
-		final Drawable startingPointDivider = app.getIconsCache().getIcon(R.drawable.bg_shadow_list_bottom);
 
 		int divHeight = AndroidUtils.dpToPx(ctx, 1f);
 		fullDivider.setIntrinsicHeight(divHeight);
 		halfDivider.setIntrinsicHeight(divHeight);
-		halfPointDivider.setIntrinsicHeight(divHeight);
 		headerDivider.setIntrinsicHeight(divHeight);
 
 		List<Drawable> res = new ArrayList<>();
@@ -268,27 +256,7 @@ public class WaypointDialogHelper {
 			Drawable d = null;
 
 			if (locationPointNext) {
-				if (locationPoint) {
-					LocationPointWrapper w = (LocationPointWrapper) obj;
-					if (w.type == WaypointHelper.TARGETS && ((TargetPoint) w.point).start) {
-						d = startingPointDivider; // starting point divider
-					} else {
-						if (w.type == WaypointHelper.TARGETS) {
-							d = halfPointDivider;
-						} else {
-							d = halfDivider;
-						}
-					}
-				} else {
-					LocationPointWrapper w = (LocationPointWrapper) objNext;
-					if (w.type == WaypointHelper.TARGETS) {
-						if (!((TargetPoint) w.point).start) {
-							d = fullDivider;
-						}
-					} else {
-						d = fullDivider;
-					}
-				}
+				d = locationPoint ? halfDivider : fullDivider;
 			} else if (objNext instanceof RadiusItem && labelView) {
 				d = headerDivider;
 			} else if (locationPoint && !bottomDividerViewNext) {
@@ -352,7 +320,7 @@ public class WaypointDialogHelper {
 					//Drawable d = new ColorDrawable(mapActivity.getResources().getColor(R.color.dashboard_divider_light));
 					AndroidUtils.setListItemBackground(mapActivity, v, nightMode);
 				} else if (labelView) {
-					v = createItemForCategory(ctx, (Integer) obj, running, position, thisAdapter, nightMode);
+					v = createItemForCategory(ctx, (Integer) obj, running, position, thisAdapter, nightMode, helper);
 					AndroidUtils.setListItemBackground(mapActivity, v, nightMode);
 				} else if (topDividerView) {
 					v = ctx.getLayoutInflater().inflate(R.layout.card_top_divider, null);
@@ -410,175 +378,62 @@ public class WaypointDialogHelper {
 			v = ctx.getLayoutInflater().inflate(R.layout.waypoint_reached, null);
 		}
 		updatePointInfoView(app, ctx, v, point, true, nightMode, edit, false);
-		final View more = v.findViewById(R.id.all_points);
-		final View move = v.findViewById(R.id.info_move);
-		final View remove = v.findViewById(R.id.info_close);
+
+		v.findViewById(R.id.all_points).setVisibility(View.GONE);
+		final ImageView move = (ImageView) v.findViewById(R.id.info_move);
+		final ImageButton remove = (ImageButton) v.findViewById(R.id.info_close);
+
 		if (!edit) {
 			remove.setVisibility(View.GONE);
 			move.setVisibility(View.GONE);
-			more.setVisibility(View.GONE);
-		} else if (point.type == WaypointHelper.TARGETS && !flat) {
-			if (((TargetPoint) point.point).start) {
-				remove.setVisibility(View.GONE);
-				move.setVisibility(View.GONE);
-				more.setVisibility(View.VISIBLE);
-				((ImageButton) more).setImageDrawable(app.getIconsCache().getIcon(
-						R.drawable.map_overflow_menu_white, !nightMode));
-				more.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View view) {
-						boolean hasActivePoints = false;
-						if (adapter instanceof StableArrayAdapter) {
-							hasActivePoints = ((StableArrayAdapter) adapter).getActiveObjects().size() > 0;
-						}
+		} else {
+			boolean notFlatTargets = point.type == WaypointHelper.TARGETS && !flat;
+			boolean startPoint = notFlatTargets && ((TargetPoint) point.point).start;
+			final TargetPointsHelper targetPointsHelper = app.getTargetPointsHelper();
+			boolean canRemove = !targetPointsHelper.getIntermediatePoints().isEmpty();
+			int iconResId = nightMode ? R.color.marker_circle_button_color_dark : R.color.ctx_menu_title_color_dark;
 
-						final PopupMenu optionsMenu = new PopupMenu(ctx, more);
-						DirectionsDialogs.setupPopUpMenuIcon(optionsMenu);
-						final TargetPointsHelper targetPointsHelper = app.getTargetPointsHelper();
-						final TargetPoint start = targetPointsHelper.getPointToStart();
-						final TargetPoint finish = targetPointsHelper.getPointToNavigate();
-						MenuItem item;
-						if (hasActivePoints) {
-							item = optionsMenu.getMenu().add(
-									R.string.intermediate_items_sort_by_distance).setIcon(app.getIconsCache().
-									getThemedIcon(R.drawable.ic_sort_waypoint_dark));
-							item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-								@Override
-								public boolean onMenuItemClick(MenuItem item) {
-									// sort door-to-door
-									sortAllTargets(app, ctx, helper);
-									return true;
+			remove.setVisibility(View.VISIBLE);
+			remove.setImageDrawable(app.getIconsCache().getIcon(R.drawable.ic_action_remove_dark, iconResId));
+			remove.setEnabled(canRemove);
+			remove.setAlpha(canRemove ? 1 : .5f);
+			if (canRemove) {
+				if (notFlatTargets && startPoint) {
+					remove.setOnClickListener(new View.OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							if (targetPointsHelper.getPointToStart() == null) {
+								if (!targetPointsHelper.getIntermediatePoints().isEmpty()) {
+									replaceStartWithFirstIntermediate(targetPointsHelper, ctx, helper);
 								}
-							});
-							item = optionsMenu.getMenu().add(
-									R.string.switch_start_finish).setIcon(app.getIconsCache().
-									getThemedIcon(R.drawable.ic_action_undo_dark));
-							item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-								@Override
-								public boolean onMenuItemClick(MenuItem item) {
-									switchStartAndFinish(targetPointsHelper, finish, ctx, start, app, helper);
-									return true;
-								}
-							});
-							if (start != null) {
-								if (targetPointsHelper.getIntermediatePoints().size() > 0) {
-									item = optionsMenu.getMenu().add(R.string.shared_string_move_down)
-											.setIcon(app.getIconsCache().getThemedIcon(R.drawable.ic_action_arrow_drop_down));
-									item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-										@Override
-										public boolean onMenuItemClick(MenuItem item) {
-											switchStartAndFirstIntermediate(targetPointsHelper, ctx, start, helper);
-											return true;
-										}
-									});
-								}
-								item = optionsMenu.getMenu().add(R.string.shared_string_remove)
-										.setIcon(app.getIconsCache().getThemedIcon(R.drawable.ic_action_remove_dark));
-								item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-									@Override
-									public boolean onMenuItemClick(MenuItem item) {
-										targetPointsHelper.setStartPoint(null, true, null);
-										updateControls(ctx, helper);
-										return true;
-									}
-								});
+							} else {
+								targetPointsHelper.setStartPoint(null, true, null);
+								updateControls(ctx, helper);
 							}
 						}
-						if (optionsMenu.getMenu().size() > 0) {
-							optionsMenu.show();
-						}
-					}
-				});
-			} else {
-				remove.setVisibility(View.GONE);
-				move.setVisibility(View.VISIBLE);
-				more.setVisibility(View.GONE);
-				((ImageView) move).setImageDrawable(app.getIconsCache().getIcon(
-						R.drawable.ic_action_reorder, !nightMode));
-				if (app.accessibilityEnabled()) {
-					move.setOnClickListener(new View.OnClickListener() {
+					});
+				} else {
+					remove.setOnClickListener(new View.OnClickListener() {
 						@Override
-						public void onClick(View view) {
-							((DragIcon) view.getTag()).onClick();
+						public void onClick(View v) {
+							deletePoint(app, ctx, adapter, helper, point, deletedPoints, true);
 						}
 					});
 				}
+			}
+
+			move.setVisibility(notFlatTargets ? View.VISIBLE : View.GONE);
+			if (notFlatTargets) {
+				move.setImageDrawable(app.getIconsCache().getIcon(R.drawable.ic_action_reorder, iconResId));
 				move.setTag(new DragIcon() {
 					@Override
 					public void onClick() {
-						final PopupMenu optionsMenu = new PopupMenu(ctx, move);
-						DirectionsDialogs.setupPopUpMenuIcon(optionsMenu);
-						List<Object> activeObjects = ((StableArrayAdapter) adapter).getActiveObjects();
-						int count = activeObjects.size();
-						int t = -1;
-						for (int i = 0; i < activeObjects.size(); i++) {
-							Object o = activeObjects.get(i);
-							if (point == o) {
-								t = i;
-								break;
-							}
-						}
-						final int index = t;
-						MenuItem item;
-						final TargetPointsHelper targetPointsHelper = app.getTargetPointsHelper();
-						final TargetPoint start = targetPointsHelper.getPointToStart();
-						if (count > 1 && (index > 0 || start != null)) {
-							item = optionsMenu.getMenu().add(R.string.shared_string_move_up)
-									.setIcon(app.getIconsCache().getThemedIcon(R.drawable.ic_action_arrow_drop_up));
-							item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-								@Override
-								public boolean onMenuItemClick(MenuItem item) {
-									if (index == 0) {
-										switchStartAndFirstIntermediate(targetPointsHelper, ctx, start, helper);
-									} else if (helper != null && helper.helperCallbacks != null) {
-										helper.helperCallbacks.exchangeWaypoints(index, index - 1);
-									}
-									updateRouteInfoMenu(ctx);
-									return true;
-								}
-							});
-						}
-						if (index < count - 1 && count > 1) {
-							item = optionsMenu.getMenu().add(R.string.shared_string_move_down)
-									.setIcon(app.getIconsCache().getThemedIcon(R.drawable.ic_action_arrow_drop_down));
-							item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-								@Override
-								public boolean onMenuItemClick(MenuItem item) {
-									if (helper != null && helper.helperCallbacks != null) {
-										helper.helperCallbacks.exchangeWaypoints(index, index + 1);
-									}
-									updateRouteInfoMenu(ctx);
-									return true;
-								}
-							});
-						}
-
-						item = optionsMenu.getMenu().add(R.string.shared_string_remove)
-								.setIcon(app.getIconsCache().getThemedIcon(R.drawable.ic_action_remove_dark));
-						item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-							@Override
-							public boolean onMenuItemClick(MenuItem item) {
-								deletePoint(app, ctx, adapter, helper, point, deletedPoints, true);
-								return true;
-							}
-						});
-						optionsMenu.show();
+						// do nothing
 					}
 				});
 			}
-		} else {
-			remove.setVisibility(View.VISIBLE);
-			move.setVisibility(View.GONE);
-			more.setVisibility(View.GONE);
-			((ImageButton) remove).setImageDrawable(app.getIconsCache().getIcon(
-					R.drawable.ic_action_remove_dark, !nightMode));
-			remove.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View view) {
-					deletePoint(app, ctx, adapter, helper, point, deletedPoints, true);
-				}
-			});
 		}
+
 		return v;
 	}
 
@@ -612,6 +467,17 @@ public class WaypointDialogHelper {
 			helper.helperCallbacks.reloadAdapter();
 		}
 		updateRouteInfoMenu(ctx);
+	}
+
+	private static void replaceStartWithFirstIntermediate(TargetPointsHelper targetPointsHelper, Activity ctx,
+														  WaypointDialogHelper helper) {
+		List<TargetPoint> intermediatePoints = targetPointsHelper.getIntermediatePointsWithTarget();
+		TargetPoint firstIntermediate = intermediatePoints.remove(0);
+		targetPointsHelper.setStartPoint(new LatLon(firstIntermediate.getLatitude(),
+				firstIntermediate.getLongitude()), false, firstIntermediate.getPointDescription(ctx));
+		targetPointsHelper.reorderAllTargetPoints(intermediatePoints, true);
+
+		updateControls(ctx, helper);
 	}
 
 	// switch start & first intermediate point
@@ -719,7 +585,8 @@ public class WaypointDialogHelper {
 	}
 
 	protected View createItemForCategory(final FragmentActivity ctx, final int type, final int[] running,
-										 final int position, final ArrayAdapter<Object> thisAdapter, boolean nightMode) {
+										 final int position, final ArrayAdapter<Object> thisAdapter,
+										 boolean nightMode, final WaypointDialogHelper helper) {
 		View v;
 		v = ctx.getLayoutInflater().inflate(R.layout.waypoint_header, null);
 		final CompoundButton btn = (CompoundButton) v.findViewById(R.id.toggle_item);
@@ -743,6 +610,71 @@ public class WaypointDialogHelper {
 			}
 
 		});
+
+		final ImageButton moreBtn = (ImageButton) v.findViewById(R.id.image_button);
+		if (type == WaypointHelper.TARGETS) {
+			moreBtn.setVisibility(View.VISIBLE);
+			moreBtn.setImageDrawable(app.getIconsCache().getIcon(R.drawable.ic_overflow_menu_white, !nightMode));
+			moreBtn.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					boolean hasActivePoints = false;
+					if (thisAdapter instanceof StableArrayAdapter) {
+						List<Object> items = ((StableArrayAdapter) thisAdapter).getActiveObjects();
+						if (items.size() > 0) {
+							if (items.size() > 1) {
+								hasActivePoints = true;
+							} else {
+								Object item = items.get(0);
+								if (item instanceof LocationPointWrapper) {
+									LocationPointWrapper w = (LocationPointWrapper) item;
+									if (w.getPoint() instanceof TargetPoint) {
+										hasActivePoints = !((TargetPoint) w.point).start;
+									}
+								} else {
+									hasActivePoints = true;
+								}
+							}
+						}
+					}
+
+					final PopupMenu optionsMenu = new PopupMenu(ctx, moreBtn);
+					DirectionsDialogs.setupPopUpMenuIcon(optionsMenu);
+					MenuItem item;
+					if (hasActivePoints) {
+						item = optionsMenu.getMenu()
+								.add(R.string.intermediate_items_sort_by_distance)
+								.setIcon(app.getIconsCache().getThemedIcon(R.drawable.ic_sort_waypoint_dark));
+						item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+							@Override
+							public boolean onMenuItemClick(MenuItem item) {
+								// sort door-to-door
+								sortAllTargets(app, ctx, helper);
+								return true;
+							}
+						});
+
+						item = optionsMenu.getMenu()
+								.add(R.string.switch_start_finish)
+								.setIcon(app.getIconsCache().getThemedIcon(R.drawable.ic_action_undo_dark));
+						item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+							@Override
+							public boolean onMenuItemClick(MenuItem item) {
+								TargetPointsHelper targetPointsHelper = app.getTargetPointsHelper();
+								switchStartAndFinish(targetPointsHelper, targetPointsHelper.getPointToNavigate(),
+										ctx, targetPointsHelper.getPointToStart(), app, helper);
+								return true;
+							}
+						});
+					}
+					if (optionsMenu.getMenu().size() > 0) {
+						optionsMenu.show();
+					}
+				}
+			});
+		} else {
+			moreBtn.setVisibility(View.GONE);
+		}
 
 		TextView tv = (TextView) v.findViewById(R.id.header_text);
 		AndroidUtils.setTextPrimaryColor(mapActivity, tv, nightMode);

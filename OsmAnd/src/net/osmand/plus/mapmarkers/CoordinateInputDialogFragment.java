@@ -265,9 +265,16 @@ public class CoordinateInputDialogFragment extends DialogFragment implements Osm
 			});
 
 			View keyboardLayout = mainView.findViewById(R.id.keyboard_layout);
+			int lightResId;
+			int darkResId;
 			if (orientationPortrait) {
-				AndroidUtils.setBackground(mapActivity, keyboardLayout, !lightTheme, R.drawable.bg_bottom_menu_light, R.drawable.bg_bottom_menu_dark);
+				lightResId = R.drawable.bg_bottom_menu_light;
+				darkResId = R.drawable.bg_bottom_menu_dark;
+			} else {
+				lightResId = rightHand ? R.drawable.bg_contextmenu_shadow_left_light : R.drawable.bg_contextmenu_shadow_right_light;
+				darkResId = lightResId;
 			}
+			AndroidUtils.setBackground(mapActivity, keyboardLayout, !lightTheme, lightResId, darkResId);
 
 			Object[] keyboardItems = new Object[] { "1", "2", "3", R.drawable.ic_keyboard_next_field,
 					"4", "5", "6", "-",
@@ -747,26 +754,12 @@ public class CoordinateInputDialogFragment extends DialogFragment implements Osm
 
 	private class KeyboardAdapter extends ArrayAdapter<Object> {
 
-		private ColorStateList dividerControlColorStateList = new ColorStateList(
-				new int[][]{
-						new int[]{android.R.attr.state_pressed},
-						new int[]{}
-				},
-				new int[] {
-						getResources().getColor(R.color.keyboard_item_divider_control_color_light_pressed),
-						getResources().getColor(R.color.keyboard_item_divider_control_color_light)
-				}
-		);
-		private ColorStateList numberColorStateList = new ColorStateList(
-				new int[][]{
-						new int[]{android.R.attr.state_pressed},
-						new int[]{}
-				},
-				new int[] {
-						getResources().getColor(R.color.keyboard_item_text_color_light_pressed),
-						getResources().getColor(R.color.keyboard_item_text_color_light)
-				}
-		);
+		private ColorStateList dividerControlColorStateList = AndroidUtils.createColorStateList(getContext(), false,
+				R.color.keyboard_item_divider_control_color_light, R.color.keyboard_item_divider_control_color_light_pressed,
+				0, 0);
+		private ColorStateList numberColorStateList = AndroidUtils.createColorStateList(getContext(), false,
+				R.color.keyboard_item_text_color_light, R.color.keyboard_item_text_color_light_pressed,
+				0, 0);
 
 		KeyboardAdapter(@NonNull Context context, @NonNull Object[] objects) {
 			super(context, 0, objects);

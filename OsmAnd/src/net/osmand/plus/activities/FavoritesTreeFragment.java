@@ -190,6 +190,13 @@ public class FavoritesTreeFragment extends OsmandExpandableListFragment {
 				getGroupExpandedPreference(groupName).set(true);
 			}
 		});
+		String groupNameToShow = ((FavoritesActivity) getActivity()).getGroupNameToShow();
+		if (groupNameToShow != null) {
+			int position = favouritesAdapter.getGroupPosition(groupNameToShow);
+			if (position != -1) {
+				listView.setSelectedGroup(position);
+			}
+		}
 		return view;
 	}
 
@@ -206,6 +213,14 @@ public class FavoritesTreeFragment extends OsmandExpandableListFragment {
 		super.onResume();
 		favouritesAdapter.synchronizeGroups();
 		initListExpandedState();
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		if (actionMode != null) {
+			actionMode.finish();
+		}
 	}
 
 	private int getSelectedFavoritesCount() {
@@ -411,7 +426,7 @@ public class FavoritesTreeFragment extends OsmandExpandableListFragment {
 							new MarkersSyncGroup(favGr.name, favGr.name, MarkersSyncGroup.FAVORITES_TYPE, favGr.color);
 					if (entry.getValue().size() == favGr.points.size()) {
 						markersHelper.addMarkersSyncGroup(syncGr);
-						markersHelper.syncGroup(syncGr);
+						markersHelper.syncGroupAsync(syncGr);
 					} else {
 						for (FavouritePoint fp : entry.getValue()) {
 							points.add(new LatLon(fp.getLatitude(), fp.getLongitude()));
@@ -957,6 +972,16 @@ public class FavoritesTreeFragment extends OsmandExpandableListFragment {
 
 		public void setFilterResults(Set<?> values) {
 			this.filter = values;
+		}
+
+		public int getGroupPosition(String groupName) {
+			for (int i = 0; i < getGroupCount(); i++) {
+				FavoriteGroup group = getGroup(i);
+				if (group.name.equals(groupName)) {
+					return i;
+				}
+			}
+			return -1;
 		}
 	}
 

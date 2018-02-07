@@ -207,6 +207,9 @@ public class AvailableGPXFragment extends OsmandExpandableListFragment {
 			asyncProcessor.cancel(false);
 			asyncProcessor = null;
 		}
+		if (actionMode != null) {
+			actionMode.finish();
+		}
 	}
 
 	public void updateCurrentTrack() {
@@ -450,7 +453,7 @@ public class AvailableGPXFragment extends OsmandExpandableListFragment {
 		optionsMenuAdapter = new ContextMenuAdapter();
 		ItemClickListener listener = new ContextMenuAdapter.ItemClickListener() {
 			@Override
-			public boolean onContextMenuClick(ArrayAdapter<ContextMenuItem> adapter, final int itemId, int pos, boolean isChecked) {
+			public boolean onContextMenuClick(ArrayAdapter<ContextMenuItem> adapter, final int itemId, int pos, boolean isChecked, int[] viewCoordinates) {
 				if (itemId == R.string.local_index_mi_reload) {
 					reloadTracks();
 				} else if (itemId == R.string.shared_string_show_on_map) {
@@ -470,11 +473,9 @@ public class AvailableGPXFragment extends OsmandExpandableListFragment {
 				return true;
 			}
 		};
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-			optionsMenuAdapter.addItem(new ContextMenuItem.ItemBuilder().setTitleId(R.string.gpx_add_track, getActivity())
-					.setIcon(R.drawable.ic_action_plus)
-					.setListener(listener).createItem());
-		}
+		optionsMenuAdapter.addItem(new ContextMenuItem.ItemBuilder().setTitleId(R.string.gpx_add_track, getActivity())
+				.setIcon(R.drawable.ic_action_plus)
+				.setListener(listener).createItem());
 		optionsMenuAdapter.addItem(new ContextMenuItem.ItemBuilder().setTitleId(R.string.shared_string_show_on_map, getActivity())
 				.setIcon(R.drawable.ic_show_on_map)
 				.setListener(listener).createItem());
@@ -521,7 +522,7 @@ public class AvailableGPXFragment extends OsmandExpandableListFragment {
 		for (int i = 0; i < optionsMenuAdapter.length(); i++) {
 			ContextMenuItem contextMenuItem = optionsMenuAdapter.getItem(i);
 			if (itemId == contextMenuItem.getTitleId()) {
-				contextMenuItem.getItemClickListener().onContextMenuClick(null, itemId, i, false);
+				contextMenuItem.getItemClickListener().onContextMenuClick(null, itemId, i, false, null);
 				return true;
 			}
 		}

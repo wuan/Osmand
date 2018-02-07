@@ -713,8 +713,10 @@ public class OsmandSettings {
 
 	public final CommonPreference<RulerMode> RULER_MODE = new EnumIntPreference<>("ruler_mode", RulerMode.FIRST, RulerMode.values()).makeGlobal();
 
-	public final CommonPreference<Boolean> SHOW_LINES_TO_FIRST_MARKERS = new BooleanPreference("show_lines_to_first_markers", false).makeGlobal();
-	public final CommonPreference<Boolean> SHOW_ARROWS_TO_FIRST_MARKERS = new BooleanPreference("show_arrows_to_first_markers", false).makeGlobal();
+	public final CommonPreference<Boolean> SHOW_LINES_TO_FIRST_MARKERS = new BooleanPreference("show_lines_to_first_markers", false).makeProfile();
+	public final CommonPreference<Boolean> SHOW_ARROWS_TO_FIRST_MARKERS = new BooleanPreference("show_arrows_to_first_markers", false).makeProfile();
+
+	public final CommonPreference<Boolean> SELECT_MARKER_ON_SINGLE_TAP = new BooleanPreference("select_marker_on_single_tap", false).makeProfile();
 
 	public final CommonPreference<Boolean> USE_MAPILLARY_FILTER = new BooleanPreference("use_mapillary_filters", false).makeGlobal();
 	public final CommonPreference<String> MAPILLARY_FILTER_USER_KEY = new StringPreference("mapillary_filter_user_key", "").makeGlobal();
@@ -1068,6 +1070,12 @@ public class OsmandSettings {
 		SHOW_PEDESTRIAN.setModeDefaultValue(ApplicationMode.CAR, true);
 	}
 
+	public final CommonPreference<Boolean> SHOW_TUNNELS = new BooleanPreference("show_tunnels", false).makeProfile().cache();
+
+	{
+		SHOW_TUNNELS.setModeDefaultValue(ApplicationMode.CAR, true);
+	}
+
 	public final OsmandPreference<Boolean> SHOW_CAMERAS = new BooleanPreference("show_cameras", false).makeProfile().cache();
 	public final CommonPreference<Boolean> SHOW_LANES = new BooleanPreference("show_lanes", false).makeProfile().cache();
 
@@ -1153,6 +1161,10 @@ public class OsmandSettings {
 
 	// this value string is synchronized with settings_pref.xml preference name
 	public final OsmandPreference<Boolean> SHOW_OSM_BUGS = new BooleanPreference("show_osm_bugs", false).makeGlobal();
+
+
+	public final CommonPreference<Boolean> SHOW_CLOSED_OSM_BUGS = new BooleanPreference("show_closed_osm_bugs", false).makeGlobal();
+	public final CommonPreference<Integer> SHOW_OSM_BUGS_MIN_ZOOM = new IntPreference("show_osm_bugs_min_zoom", 8).makeGlobal();
 
 	public final CommonPreference<String> MAP_INFO_CONTROLS = new StringPreference("map_info_controls", "").makeProfile();
 	{
@@ -1315,6 +1327,10 @@ public class OsmandSettings {
 
 	public final OsmandPreference<Boolean> USE_MAP_MARKERS = new BooleanPreference("use_map_markers", true).makeGlobal().cache();
 
+	public final OsmandPreference<Boolean> MARKERS_DISTANCE_INDICATION_ENABLED = new BooleanPreference("markers_distance_indication_enabled", true).makeProfile();
+
+	public final OsmandPreference<Integer> DISPLAYED_MARKERS_WIDGETS_COUNT = new IntPreference("displayed_markers_widgets_count", 1).makeProfile();
+
 	public final CommonPreference<MapMarkersMode> MAP_MARKERS_MODE =
 			new EnumIntPreference<>("map_markers_mode", MapMarkersMode.TOOLBAR, MapMarkersMode.values());
 
@@ -1328,6 +1344,8 @@ public class OsmandSettings {
 		MAP_MARKERS_MODE.setModeDefaultValue(ApplicationMode.BICYCLE, MapMarkersMode.TOOLBAR);
 		MAP_MARKERS_MODE.setModeDefaultValue(ApplicationMode.PEDESTRIAN, MapMarkersMode.TOOLBAR);
 	}
+
+	public final CommonPreference<NotesSortByMode> NOTES_SORT_BY_MODE = new EnumIntPreference<>("notes_sort_by_mode", NotesSortByMode.BY_DATE, NotesSortByMode.values());
 
 	public final OsmandPreference<Boolean> ANIMATE_MY_LOCATION = new BooleanPreference("animate_my_location", true).makeGlobal().cache();
 
@@ -3150,6 +3168,19 @@ public class OsmandSettings {
 
 		public String toHumanString(Context ctx) {
 			return ctx.getString(key);
+		}
+	}
+
+	public enum NotesSortByMode {
+		BY_TYPE,
+		BY_DATE;
+
+		public boolean isByType() {
+			return this == BY_TYPE;
+		}
+
+		public boolean isByDate() {
+			return this == BY_DATE;
 		}
 	}
 

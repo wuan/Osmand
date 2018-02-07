@@ -15,7 +15,6 @@ import net.osmand.data.LatLon;
 import net.osmand.plus.IconsCache;
 import net.osmand.plus.MapMarkersHelper;
 import net.osmand.plus.MapMarkersHelper.MapMarker;
-import net.osmand.plus.OsmandSettings;
 import net.osmand.plus.R;
 import net.osmand.plus.activities.MapActivity;
 import net.osmand.plus.dashboard.DashLocationFragment;
@@ -42,10 +41,11 @@ public class MapMarkersActiveAdapter extends RecyclerView.Adapter<MapMarkerItemV
 	private boolean night;
 
 	public MapMarkersActiveAdapter(MapActivity mapActivity) {
+		setHasStableIds(true);
 		this.mapActivity = mapActivity;
 		markers = mapActivity.getMyApplication().getMapMarkersHelper().getMapMarkers();
 		night = !mapActivity.getMyApplication().getSettings().isLightContent();
-		showDirectionEnabled = mapActivity.getMyApplication().getSettings().MAP_MARKERS_MODE.get() != OsmandSettings.MapMarkersMode.NONE;
+		showDirectionEnabled = mapActivity.getMyApplication().getSettings().MARKERS_DISTANCE_INDICATION_ENABLED.get();
 	}
 
 	public void setShowDirectionEnabled(boolean showDirectionEnabled) {
@@ -93,7 +93,8 @@ public class MapMarkersActiveAdapter extends RecyclerView.Adapter<MapMarkerItemV
 		int drawableResToUpdate;
 		int markerColor = MapMarker.getColorId(marker.colorIndex);
 		LatLon markerLatLon = new LatLon(marker.getLatitude(), marker.getLongitude());
-		if (showDirectionEnabled && pos < 2) {
+		int displayedWidgets = mapActivity.getMyApplication().getSettings().DISPLAYED_MARKERS_WIDGETS_COUNT.get();
+		if (showDirectionEnabled && pos < displayedWidgets) {
 			holder.iconDirection.setVisibility(View.GONE);
 
 			holder.icon.setImageDrawable(iconsCache.getIcon(R.drawable.ic_arrow_marker_diretion, markerColor));
@@ -171,24 +172,16 @@ public class MapMarkersActiveAdapter extends RecyclerView.Adapter<MapMarkerItemV
 				final MapMarker marker = markers.get(position);
 
 				mapActivity.getMyApplication().getMapMarkersHelper().moveMapMarkerToHistory(marker);
-				notifyItemRemoved(position);
-				if (showDirectionEnabled && position < 2 && getItemCount() > 1) {
-					notifyItemChanged(1);
-				} else if (position == getItemCount()) {
-					notifyItemChanged(position - 1);
-				}
+				changeMarkers();
+				notifyDataSetChanged();
 
 				snackbar = Snackbar.make(holder.itemView, mapActivity.getString(R.string.marker_moved_to_history), Snackbar.LENGTH_LONG)
 						.setAction(R.string.shared_string_undo, new View.OnClickListener() {
 							@Override
 							public void onClick(View view) {
 								mapActivity.getMyApplication().getMapMarkersHelper().restoreMarkerFromHistory(marker, position);
-								notifyItemInserted(position);
-								if (showDirectionEnabled && position < 2 && getItemCount() > 2) {
-									notifyItemChanged(2);
-								} else if (position == getItemCount() - 1) {
-									notifyItemChanged(position - 1);
-								}
+								changeMarkers();
+								notifyDataSetChanged();
 							}
 						});
 				View snackBarView = snackbar.getView();
@@ -215,6 +208,10 @@ public class MapMarkersActiveAdapter extends RecyclerView.Adapter<MapMarkerItemV
 
 	public List<MapMarker> getItems() {
 		return markers;
+	}
+
+	public void changeMarkers() {
+		markers = mapActivity.getMyApplication().getMapMarkersHelper().getMapMarkers();
 	}
 
 	public void hideSnackbar() {
@@ -244,29 +241,26 @@ public class MapMarkersActiveAdapter extends RecyclerView.Adapter<MapMarkerItemV
 		if (group != null) {
 			mapActivity.getMyApplication().getMapMarkersHelper().updateGroup(group);
 		}
-		notifyItemRemoved(pos);
-		if (showDirectionEnabled && pos < 2 && getItemCount() > 1) {
-			notifyItemChanged(1);
-		} else if (pos == getItemCount()) {
-			notifyItemChanged(pos - 1);
-		}
+		changeMarkers();
+		notifyDataSetChanged();
 		snackbar = Snackbar.make(holder.itemView, R.string.marker_moved_to_history, Snackbar.LENGTH_LONG)
 				.setAction(R.string.shared_string_undo, new View.OnClickListener() {
 					@Override
 					public void onClick(View view) {
 						mapActivity.getMyApplication().getMapMarkersHelper().restoreMarkerFromHistory(marker, pos);
-						notifyItemInserted(pos);
-						if (showDirectionEnabled && pos < 2 && getItemCount() > 2) {
-							notifyItemChanged(2);
-						} else if (pos == getItemCount() - 1) {
-							notifyItemChanged(pos - 1);
-						}
+						changeMarkers();
+						notifyDataSetChanged();
 					}
 				});
 		View snackBarView = snackbar.getView();
 		TextView tv = (TextView) snackBarView.findViewById(android.support.design.R.id.snackbar_action);
 		tv.setTextColor(ContextCompat.getColor(mapActivity, R.color.color_dialog_buttons_dark));
 		snackbar.show();
+	}
+
+	@Override
+	public long getItemId(int position) {
+		return getItem(position).hashCode();
 	}
 
 	@Override

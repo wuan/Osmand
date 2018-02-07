@@ -14,11 +14,14 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.View;
 
 import net.osmand.Location;
+import net.osmand.data.Amenity;
 import net.osmand.data.LatLon;
 import net.osmand.data.PointDescription;
 import net.osmand.data.QuadPoint;
@@ -28,6 +31,7 @@ import net.osmand.plus.MapMarkersHelper;
 import net.osmand.plus.MapMarkersHelper.MapMarker;
 import net.osmand.plus.OsmAndConstants;
 import net.osmand.plus.OsmAndFormatter;
+import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.OsmandSettings;
 import net.osmand.plus.R;
 import net.osmand.plus.TargetPointsHelper.TargetPoint;
@@ -40,6 +44,7 @@ import net.osmand.plus.views.mapwidgets.MapMarkersWidgetsFactory;
 import net.osmand.util.MapUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import gnu.trove.list.array.TIntArrayList;
@@ -50,8 +55,6 @@ public class MapMarkersLayer extends OsmandMapLayer implements IContextMenuProvi
 	private static final long USE_FINGER_LOCATION_DELAY = 1000;
 	private static final int MAP_REFRESH_MESSAGE = OsmAndConstants.UI_HANDLER_MAP_VIEW + 6;
 	protected static final int DIST_TO_SHOW = 80;
-	private static final int TEXT_SIZE = 12;
-	private static final int VERTICAL_OFFSET = 10;
 
 	private final MapActivity map;
 	private OsmandMapTileView view;
@@ -83,6 +86,9 @@ public class MapMarkersLayer extends OsmandMapLayer implements IContextMenuProvi
 	private final RenderingLineAttributes textAttrs = new RenderingLineAttributes("rulerLineFont");
 	private final RenderingLineAttributes planRouteAttrs = new RenderingLineAttributes("markerPlanRouteline");
 	private TrkSegment route;
+
+	private float textSize;
+	private int verticalOffset;
 
 	private TIntArrayList tx = new TIntArrayList();
 	private TIntArrayList ty = new TIntArrayList();
@@ -146,6 +152,9 @@ public class MapMarkersLayer extends OsmandMapLayer implements IContextMenuProvi
 		widgetsFactory = new MapMarkersWidgetsFactory(map);
 
 		contextMenuLayer = view.getLayerByClass(ContextMenuLayer.class);
+
+		textSize = map.getResources().getDimensionPixelSize(R.dimen.guide_line_text_size);
+		verticalOffset = map.getResources().getDimensionPixelSize(R.dimen.guide_line_vertical_offset);
 	}
 
 	private Paint createPaintDest(int colorId) {
@@ -219,9 +228,17 @@ public class MapMarkersLayer extends OsmandMapLayer implements IContextMenuProvi
 
 	@Override
 	public void onPrepareBufferImage(Canvas canvas, RotatedTileBox tileBox, DrawSettings nightMode) {
-		Location myLoc = map.getMyApplication().getLocationProvider().getLastStaleKnownLocation();
+		Location myLoc;
+		if (useFingerLocation && fingerLocation != null) {
+			myLoc = new Location("");
+			myLoc.setLatitude(fingerLocation.getLatitude());
+			myLoc.setLongitude(fingerLocation.getLongitude());
+		} else {
+			myLoc = map.getMyApplication().getLocationProvider().getLastStaleKnownLocation();
+		}
 		MapMarkersHelper markersHelper = map.getMyApplication().getMapMarkersHelper();
 		List<MapMarker> activeMapMarkers = markersHelper.getMapMarkers();
+		int displayedWidgets = map.getMyApplication().getSettings().DISPLAYED_MARKERS_WIDGETS_COUNT.get();
 
 		if (route != null && route.points.size() > 0) {
 			planRouteAttrs.updatePaints(view, nightMode, tileBox);
@@ -231,13 +248,14 @@ public class MapMarkersLayer extends OsmandMapLayer implements IContextMenuProvi
 		}
 
 		if (map.getMyApplication().getSettings().SHOW_LINES_TO_FIRST_MARKERS.get() && myLoc != null) {
-			float textSize = TEXT_SIZE * map.getResources().getDisplayMetrics().density * map.getMyApplication().getSettings().TEXT_SCALE.get();
 			textAttrs.paint.setTextSize(textSize);
 			textAttrs.paint2.setTextSize(textSize);
 
 			lineAttrs.updatePaints(view, nightMode, tileBox);
 			textAttrs.updatePaints(view, nightMode, tileBox);
 			textAttrs.paint.setStyle(Paint.Style.FILL);
+
+			boolean drawMarkerName = map.getMyApplication().getSettings().DISPLAYED_MARKERS_WIDGETS_COUNT.get() == 1;
 
 			int locX;
 			int locY;
@@ -251,7 +269,7 @@ public class MapMarkersLayer extends OsmandMapLayer implements IContextMenuProvi
 				locY = (int) tileBox.getPixYFromLatLon(myLoc.getLatitude(), myLoc.getLongitude());
 			}
 			int[] colors = MapMarker.getColors(map);
-			for (int i = 0; i < activeMapMarkers.size() && i < 2; i++) {
+			for (int i = 0; i < activeMapMarkers.size() && i < displayedWidgets; i++) {
 				MapMarker marker = activeMapMarkers.get(i);
 				int markerX = (int) tileBox.getPixXFromLatLon(marker.getLatitude(), marker.getLongitude());
 				int markerY = (int) tileBox.getPixYFromLatLon(marker.getLatitude(), marker.getLongitude());
@@ -272,7 +290,7 @@ public class MapMarkersLayer extends OsmandMapLayer implements IContextMenuProvi
 
 				float dist = (float) MapUtils.getDistance(myLoc.getLatitude(), myLoc.getLongitude(), marker.getLatitude(), marker.getLongitude());
 				String distSt = OsmAndFormatter.getFormattedDistance(dist, view.getApplication());
-				String text = distSt + " • " + marker.getName(map);
+				String text = distSt + (drawMarkerName ? " • " + marker.getName(map) : "");
 				Rect bounds = new Rect();
 				textAttrs.paint.getTextBounds(text, 0, text.length(), bounds);
 				float hOffset = pm.getLength() / 2 - bounds.width() / 2;
@@ -282,12 +300,12 @@ public class MapMarkersLayer extends OsmandMapLayer implements IContextMenuProvi
 				canvas.drawPath(linePath, lineAttrs.paint);
 				if (locX >= markerX) {
 					canvas.rotate(180, pos[0], pos[1]);
-					canvas.drawTextOnPath(text, linePath, hOffset, bounds.height() + VERTICAL_OFFSET, textAttrs.paint2);
-					canvas.drawTextOnPath(text, linePath, hOffset, bounds.height() + VERTICAL_OFFSET, textAttrs.paint);
+					canvas.drawTextOnPath(text, linePath, hOffset, bounds.height() + verticalOffset, textAttrs.paint2);
+					canvas.drawTextOnPath(text, linePath, hOffset, bounds.height() + verticalOffset, textAttrs.paint);
 					canvas.rotate(-180, pos[0], pos[1]);
 				} else {
-					canvas.drawTextOnPath(text, linePath, hOffset, -VERTICAL_OFFSET, textAttrs.paint2);
-					canvas.drawTextOnPath(text, linePath, hOffset, -VERTICAL_OFFSET, textAttrs.paint);
+					canvas.drawTextOnPath(text, linePath, hOffset, -verticalOffset, textAttrs.paint2);
+					canvas.drawTextOnPath(text, linePath, hOffset, -verticalOffset, textAttrs.paint);
 				}
 				canvas.rotate(tileBox.getRotate(), tileBox.getCenterPixelX(), tileBox.getCenterPixelY());
 			}
@@ -305,11 +323,13 @@ public class MapMarkersLayer extends OsmandMapLayer implements IContextMenuProvi
 			return;
 		}
 
+		int displayedWidgets = settings.DISPLAYED_MARKERS_WIDGETS_COUNT.get();
+
 		MapMarkersHelper markersHelper = map.getMyApplication().getMapMarkersHelper();
 
 		for (MapMarker marker : markersHelper.getMapMarkers()) {
 			if (isLocationVisible(tileBox, marker) && !overlappedByWaypoint(marker)
-					&& !isInMotion(marker)) {
+					&& !isInMotion(marker) && !isSynced(marker)) {
 				Bitmap bmp = getMapMarkerBitmap(marker.colorIndex);
 				int marginX = bmp.getWidth() / 6;
 				int marginY = bmp.getHeight();
@@ -340,7 +360,7 @@ public class MapMarkersLayer extends OsmandMapLayer implements IContextMenuProvi
 					canvas.restore();
 				}
 				i++;
-				if (i > 1) {
+				if (i > displayedWidgets - 1) {
 					break;
 				}
 			}
@@ -348,15 +368,20 @@ public class MapMarkersLayer extends OsmandMapLayer implements IContextMenuProvi
 
 		if (contextMenuLayer.getMoveableObject() instanceof MapMarker) {
 			MapMarker objectInMotion = (MapMarker) contextMenuLayer.getMoveableObject();
-			Bitmap bitmap = getMapMarkerBitmap(objectInMotion.colorIndex);
 			PointF pf = contextMenuLayer.getMovableCenterPoint(tileBox);
+			Bitmap bitmap = getMapMarkerBitmap(objectInMotion.colorIndex);
 			int marginX = bitmap.getWidth() / 6;
 			int marginY = bitmap.getHeight();
 			float locationX = pf.x;
 			float locationY = pf.y;
 			canvas.rotate(-tileBox.getRotate(), locationX, locationY);
 			canvas.drawBitmap(bitmap, locationX - marginX, locationY - marginY, bitmapPaint);
+
 		}
+	}
+
+	private boolean isSynced(@NonNull MapMarker marker) {
+		return marker.wptPt != null || marker.favouritePoint != null;
 	}
 
 	private boolean isInMotion(@NonNull MapMarker marker) {
@@ -467,46 +492,78 @@ public class MapMarkersLayer extends OsmandMapLayer implements IContextMenuProvi
 	}
 
 	@Override
-	public void collectObjectsFromPoint(PointF point, RotatedTileBox tileBox, List<Object> o) {
+	public boolean runExclusiveAction(Object o, boolean unknownLocation) {
+		if (unknownLocation || o == null || !(o instanceof MapMarker)
+				|| !map.getMyApplication().getSettings().SELECT_MARKER_ON_SINGLE_TAP.get()) {
+			return false;
+		}
+		final MapMarkersHelper helper = map.getMyApplication().getMapMarkersHelper();
+		final MapMarker old = helper.getMapMarkers().get(0);
+		helper.moveMarkerToTop((MapMarker) o);
+		String title = map.getString(R.string.marker_activated, helper.getMapMarkers().get(0).getName(map));
+		Snackbar.make(map.findViewById(R.id.bottomFragmentContainer), title, Snackbar.LENGTH_LONG)
+				.setAction(R.string.shared_string_cancel, new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						helper.moveMarkerToTop(old);
+					}
+				})
+				.show();
+		return true;
+	}
+
+	@Override
+	public void collectObjectsFromPoint(PointF point, RotatedTileBox tileBox, List<Object> o, boolean unknownLocation) {
 		if (tileBox.getZoom() < 3 || !map.getMyApplication().getSettings().USE_MAP_MARKERS.get()) {
 			return;
 		}
 
-		MapMarkersHelper markersHelper = map.getMyApplication().getMapMarkersHelper();
-		List<MapMarker> markers = markersHelper.getMapMarkers();
-		int r = getRadiusPoi(tileBox);
-		for (int i = 0; i < markers.size(); i++) {
-			MapMarker marker = markers.get(i);
-			LatLon latLon = marker.point;
-			if (latLon != null) {
-				int ex = (int) point.x;
-				int ey = (int) point.y;
-				int x = (int) tileBox.getPixXFromLatLon(latLon.getLatitude(), latLon.getLongitude());
-				int y = (int) tileBox.getPixYFromLatLon(latLon.getLatitude(), latLon.getLongitude());
-				if (calculateBelongs(ex, ey, x, y, r)) {
-					o.add(marker);
+		OsmandApplication app = map.getMyApplication();
+		int r = getDefaultRadiusPoi(tileBox);
+		boolean selectMarkerOnSingleTap = app.getSettings().SELECT_MARKER_ON_SINGLE_TAP.get();
+
+		for (MapMarker marker : app.getMapMarkersHelper().getMapMarkers()) {
+			if ((!unknownLocation && selectMarkerOnSingleTap) || !isSynced(marker)) {
+				LatLon latLon = marker.point;
+				if (latLon != null) {
+					int x = (int) tileBox.getPixXFromLatLon(latLon.getLatitude(), latLon.getLongitude());
+					int y = (int) tileBox.getPixYFromLatLon(latLon.getLatitude(), latLon.getLongitude());
+
+					if (calculateBelongs((int) point.x, (int) point.y, x, y, r)) {
+						if (!unknownLocation && selectMarkerOnSingleTap) {
+							o.add(marker);
+						} else {
+							if (isMarkerOnFavorite(marker) || isMarkerOnWaypoint(marker)) {
+								continue;
+							}
+							Amenity mapObj = getMapObjectByMarker(marker);
+							o.add(mapObj == null ? marker : mapObj);
+						}
+					}
 				}
 			}
 		}
 	}
 
-	private boolean calculateBelongs(int ex, int ey, int objx, int objy, int radius) {
-		return Math.abs(objx - ex) <= radius && (ey - objy) <= radius && (objy - ey) <= 2.5 * radius;
+	private boolean isMarkerOnWaypoint(@NonNull MapMarker marker) {
+		return marker.point != null && map.getMyApplication().getSelectedGpxHelper().getVisibleWayPointByLatLon(marker.point) != null;
 	}
 
-	public int getRadiusPoi(RotatedTileBox tb) {
-		int r;
-		final double zoom = tb.getZoom();
-		if (zoom <= 15) {
-			r = 10;
-		} else if (zoom <= 16) {
-			r = 14;
-		} else if (zoom <= 17) {
-			r = 16;
-		} else {
-			r = 18;
+	private boolean isMarkerOnFavorite(@NonNull MapMarker marker) {
+		return marker.point != null && map.getMyApplication().getFavorites().getVisibleFavByLatLon(marker.point) != null;
+	}
+
+	@Nullable
+	public Amenity getMapObjectByMarker(@NonNull MapMarker marker) {
+		if (marker.mapObjectName != null && marker.point != null) {
+			String mapObjName = marker.mapObjectName.split("_")[0];
+			return findAmenity(map.getMyApplication(), -1, Collections.singletonList(mapObjName), marker.point, 15);
 		}
-		return (int) (r * tb.getDensity());
+		return null;
+	}
+
+	private boolean calculateBelongs(int ex, int ey, int objx, int objy, int radius) {
+		return Math.abs(objx - ex) <= radius * 1.5 && (ey - objy) <= radius * 1.5 && (objy - ey) <= 2.5 * radius;
 	}
 
 	@Override

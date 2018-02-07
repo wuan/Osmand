@@ -10,9 +10,14 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import net.osmand.Location;
+import net.osmand.data.Amenity;
+import net.osmand.data.FavouritePoint;
 import net.osmand.data.LatLon;
+import net.osmand.data.PointDescription;
+import net.osmand.plus.GPXUtilities.WptPt;
 import net.osmand.plus.MapMarkersHelper.MapMarker;
 import net.osmand.plus.OsmAndLocationProvider.OsmAndCompassListener;
 import net.osmand.plus.OsmAndLocationProvider.OsmAndLocationListener;
@@ -25,6 +30,7 @@ import net.osmand.plus.dashboard.DashLocationFragment;
 import net.osmand.plus.mapmarkers.adapters.MapMarkersActiveAdapter;
 import net.osmand.plus.mapmarkers.adapters.MapMarkersActiveAdapter.MapMarkersActiveAdapterListener;
 import net.osmand.plus.mapmarkers.adapters.MapMarkersItemTouchHelperCallback;
+import net.osmand.plus.widgets.EmptyStateRecyclerView;
 import net.osmand.util.MapUtils;
 
 public class MapMarkersActiveFragment extends Fragment implements OsmAndCompassListener, OsmAndLocationListener {
@@ -38,10 +44,9 @@ public class MapMarkersActiveFragment extends Fragment implements OsmAndCompassL
 	@Nullable
 	@Override
 	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-		final RecyclerView recyclerView = new RecyclerView(getContext());
 		final MapActivity mapActivity = (MapActivity) getActivity();
-		recyclerView.setPadding(0, 0, 0, (int) mapActivity.getResources().getDimension(R.dimen.map_markers_recycler_view_padding_bottom));
-		recyclerView.setClipToPadding(false);
+		final View mainView = inflater.inflate(R.layout.fragment_map_markers_active, container, false);
+		final EmptyStateRecyclerView recyclerView = (EmptyStateRecyclerView) mainView.findViewById(R.id.list);
 		recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
 		adapter = new MapMarkersActiveAdapter(mapActivity);
@@ -58,11 +63,41 @@ public class MapMarkersActiveFragment extends Fragment implements OsmAndCompassL
 				if (pos == RecyclerView.NO_POSITION) {
 					return;
 				}
+
 				MapMarker marker = adapter.getItem(pos);
-				mapActivity.getMyApplication().getSettings()
-						.setMapLocationToShow(marker.getLatitude(), marker.getLongitude(), 15, null, false, null);
+				OsmandApplication app = mapActivity.getMyApplication();
+				if (app.getSettings().SELECT_MARKER_ON_SINGLE_TAP.get()) {
+					app.getMapMarkersHelper().moveMarkerToTop(marker);
+					updateAdapter();
+				} else {
+					FavouritePoint fav = marker.favouritePoint == null
+							? app.getFavorites().getVisibleFavByLatLon(marker.point)
+							: marker.favouritePoint;
+					if (fav != null) {
+						showMap(marker.point, fav.getPointDescription(), fav);
+						return;
+					}
+
+					WptPt pt = marker.wptPt == null
+							? app.getSelectedGpxHelper().getVisibleWayPointByLatLon(marker.point)
+							: marker.wptPt;
+					if (pt != null) {
+						showMap(marker.point, pt.getPointDescription(mapActivity), pt);
+						return;
+					}
+
+					Amenity mapObj = mapActivity.getMapLayers().getMapMarkersLayer().getMapObjectByMarker(marker);
+					PointDescription desc = mapObj == null
+							? marker.getPointDescription(mapActivity)
+							: mapActivity.getMapLayers().getPoiMapLayer().getObjectName(mapObj);
+					showMap(marker.point, desc, mapObj == null ? marker : mapObj);
+				}
+			}
+
+			private void showMap(LatLon latLon, PointDescription desc, Object objToShow) {
+				mapActivity.getMyApplication().getSettings().setMapLocationToShow(latLon.getLatitude(),
+						latLon.getLongitude(), 15, desc, true, objToShow);
 				MapActivity.launchMapActivityMoveToTop(mapActivity);
-				MarkerMenuOnMapFragment.showInstance(mapActivity, marker);
 				((DialogFragment) getParentFragment()).dismiss();
 			}
 
@@ -90,6 +125,11 @@ public class MapMarkersActiveFragment extends Fragment implements OsmAndCompassL
 				compassUpdateAllowed = false;
 			}
 		});
+
+		final View emptyView = mainView.findViewById(R.id.empty_view);
+		ImageView emptyImageView = (ImageView) emptyView.findViewById(R.id.empty_state_image_view);
+		emptyImageView.setImageResource(mapActivity.getMyApplication().getSettings().isLightContent() ? R.drawable.ic_empty_state_marker_list_day : R.drawable.ic_empty_state_marker_list_night);
+		recyclerView.setEmptyView(emptyView);
 		recyclerView.setAdapter(adapter);
 		recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 			@Override
@@ -98,7 +138,7 @@ public class MapMarkersActiveFragment extends Fragment implements OsmAndCompassL
 				compassUpdateAllowed = newState == RecyclerView.SCROLL_STATE_IDLE;
 			}
 		});
-		return recyclerView;
+		return mainView;
 	}
 
 	@Override
@@ -154,6 +194,7 @@ public class MapMarkersActiveFragment extends Fragment implements OsmAndCompassL
 
 	void updateAdapter() {
 		if (adapter != null) {
+			adapter.changeMarkers();
 			adapter.notifyDataSetChanged();
 		}
 	}

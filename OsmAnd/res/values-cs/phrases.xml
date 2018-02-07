@@ -51,7 +51,7 @@
 	<string name="poi_service_tyres">Pneu</string>
 	<string name="poi_car_wash">Myčka</string>
 	<string name="poi_fuel">Čerpací stanice</string>
-	<string name="poi_charging_station">Dobíjecí stanice</string>
+	<string name="poi_electricity_combined_charging">Dobíjecí stanice</string>
 	<string name="poi_parking">Parkoviště</string>
 	<string name="poi_garages">Garáže</string>
 
@@ -2959,8 +2959,8 @@
 	<string name="poi_takeaway">Jídlo s sebou</string>
 	<string name="poi_wheelchair_accessibility">Přístupné pro vozíčkáře</string>
 	<string name="poi_cuisine_ice_cream">Zmrzlina</string>
-	<string name="poi_fuel_type">Typ</string>
-	<string name="poi_fuel_avia_type">Typ</string>
+	<string name="poi_fuel_type">Typ paliva</string>
+	<string name="poi_fuel_avia_type">Typ paliva (letecké)</string>
 	<string name="poi_clothes_type">Typ</string>
 	<string name="poi_shoes_type">Typ</string>
 	<string name="poi_fire_hydrant_type">Typ</string>
@@ -3493,5 +3493,10 @@
 	<string name="poi_government_legislative">Legislativní instituce</string>
 
 <string name="poi_vhf">VKV kanál</string>
+
+<string name="poi_operational_status">Provozní stav</string>
+	<string name="poi_water_supply_type">Typ dodávky vody</string>
+	<string name="poi_water_purification">Čištění vody</string>
+	<string name="poi_water_place_access">Přístup k místu s vodou</string>
 
 </resources>

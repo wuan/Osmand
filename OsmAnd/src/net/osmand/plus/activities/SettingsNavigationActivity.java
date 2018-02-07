@@ -194,8 +194,8 @@ public class SettingsNavigationActivity extends SettingsBaseActivity {
 		registerListPreference(settings.ARRIVAL_DISTANCE_FACTOR, screen, arrivalNames, arrivalValues);
 
 		//array size should be equal!
-		Float[] speedLimitsKm = new Float[]{0f, 5f, 7f, 10f, 15f, 20f};
-		Float[] speedLimitsMiles = new Float[]{0f, 3f, 5f, 7f, 10f, 15f};
+		Float[] speedLimitsKm = new Float[]{-10f, -7f,-5f, 0f, 5f, 7f, 10f, 15f, 20f};
+		Float[] speedLimitsMiles = new Float[]{-7f, -5f, -3f, 0f, 3f, 5f, 7f, 10f, 15f};
 		if (settings.METRIC_SYSTEM.get() == OsmandSettings.MetricsConstants.KILOMETERS_AND_METERS) {
 			String[] speedNames = new String[speedLimitsKm.length];
 			for (int i =0; i<speedLimitsKm.length;i++){
@@ -630,8 +630,8 @@ public class SettingsNavigationActivity extends SettingsBaseActivity {
 			return true;
 		} else if (preference == showAlarms) {
 			showBooleanSettings(new String[] { getString(R.string.show_traffic_warnings), getString(R.string.show_pedestrian_warnings),
-					getString(R.string.show_cameras), getString(R.string.show_lanes) }, new OsmandPreference[] { settings.SHOW_TRAFFIC_WARNINGS,
-					settings.SHOW_PEDESTRIAN, settings.SHOW_CAMERAS, settings.SHOW_LANES }, preference.getTitle());
+					getString(R.string.show_cameras), getString(R.string.show_lanes), getString(R.string.show_tunnels) }, new OsmandPreference[] { settings.SHOW_TRAFFIC_WARNINGS,
+					settings.SHOW_PEDESTRIAN, settings.SHOW_CAMERAS, settings.SHOW_LANES, settings.SHOW_TUNNELS }, preference.getTitle());
 			return true;
 		} else if (preference == speakAlarms) {
 			AlertDialog dlg = showBooleanSettings(new String[] { getString(R.string.speak_street_names),

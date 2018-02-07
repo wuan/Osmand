@@ -236,8 +236,8 @@
 	
 	<string name="shared_string_next">下一页</string>
 	<string name="shared_string_previous">上一页</string>
-	<string name="unit_of_length_descr">变更单位的长度和速度</string>
-	<string name="unit_of_length">度量单位</string>
+	<string name="unit_of_length_descr">更改长度单位。</string>
+	<string name="unit_of_length">长度单位</string>
 	<string name="si_mi_feet">英里/英尺</string>
 	<string name="si_mi_yard">英里/码</string>
 	<string name="si_km_m">公里/米</string>
@@ -542,7 +542,7 @@
 	<string name="osmand_plus_play_title_30_chars">OsmAnd+ 地图与导航</string>
 	<string name="filterpoi_activity">创建 POI 过滤器</string>
 	<string name="day_night_info_description">日出：%1$s \n日落：%2$s</string>
-	<string name="day_night_info">白天/黑夜信息</string>
+	<string name="day_night_info">日/夜信息</string>
 	
 	<string name="map_widget_vector_attributes">渲染属性</string>
 	<string name="layer_map_appearance">配置屏幕</string>
@@ -963,7 +963,7 @@
     <string name="osm_user_stat">编辑数 %1$s，排名 %2$s，总计编辑 %3$s</string>
     <string name="osm_editors_ranking">OSM 编辑排名</string>
     <string name="osm_live_subscribe_btn">订阅</string>
-    <string name="osm_live_subscription">OSM 实时订阅</string>
+    <string name="osm_live_subscription">OsmAnd 实时订阅</string>
     <string name="osm_live_user_public_name">公开名称</string>
     <string name="osm_live_email_desc">我们需要它来提供您的贡献信息</string>
     <string name="osm_live_hide_user_name">不在报告中显示我的名称</string>
@@ -976,7 +976,7 @@
     <string name="osm_live_enter_user_name">请输入公开名称</string>
     <string name="osm_live_thanks">感谢您订阅在线更新！</string>
     <string name="osm_live_subscription_settings">订阅设置</string>
-    <string name="osm_live_ask_for_purchase">请先购买 OSM 实时订阅</string>
+    <string name="osm_live_ask_for_purchase">请先购买 OsmAnd 实时订阅</string>
 
     <string name="select_map_marker">选择地图标记</string>
     <string name="map_markers_other">其他标记</string>
@@ -1265,8 +1265,8 @@
     <string name="select_city">选择城市</string>
     <string name="select_postcode">选择邮政编码</string>
     <string name="quick_action_auto_zoom">地图自动缩放开关</string>
-    <string name="quick_action_auto_zoom_on">地图自动缩放开启</string>
-    <string name="quick_action_auto_zoom_off">地图自动缩放关闭</string>
+    <string name="quick_action_auto_zoom_on">启用地图自动缩放</string>
+    <string name="quick_action_auto_zoom_off">禁用地图自动缩放</string>
     <string name="quick_action_add_destination">添加目的地</string>
     <string name="quick_action_replace_destination">更换目的地</string>
     <string name="quick_action_add_first_intermediate">添加第一个途径地</string>
@@ -1302,7 +1302,7 @@
     <string name="audionotes_plugin_name">音频/视频笔记</string>
     <string name="rendering_value_light_brown_name">浅棕色</string>
     <string name="rendering_value_dark_brown_name">深棕色</string>
-    <string name="use_osm_live_routing">OSM 实时导航</string>
+    <string name="use_osm_live_routing">OsmAnd 实时导航</string>
     <string name="release_2_3">\\u2022 OSM 实时功能。支持地图贡献者和开发者获取每小时更新的地图。
 \n 
 \n • 地图标记。新的快速地图选点的方式。 
@@ -1369,7 +1369,7 @@
     <string name="rendering_attr_showCycleRoutes_name">显示自行车路线</string>
     <string name="rendering_attr_horseRoutes_name">马匹路线</string>
     <string name="download_wikipedia_maps">维基百科</string>
-    <string name="do_not_show_startup_messages_desc">它显示应用折扣信息和特殊本地事件信息</string>
+    <string name="do_not_show_startup_messages_desc">停止显示应用折扣信息和特殊本地事件信息。</string>
     <string name="shared_string_max">最大</string>
     <string name="shared_string_time">时间</string>
     <string name="total_distance">总距离</string>
@@ -1423,12 +1423,12 @@
     <string name="restart_search">重新开始搜索</string>
     <string name="increase_search_radius">增加搜索范围</string>
     <string name="nothing_found">什么都没找到 :(</string>
-    <string name="nothing_found_descr">尝试改变搜索查询内容或增加搜索范围</string>
+    <string name="nothing_found_descr">尝试改变搜索查询内容或增加搜索范围。</string>
     <string name="quick_action_showhide_osmbugs_title">显示/隐藏 OSM 笔记</string>
     <string name="quick_action_osmbugs_show">显示 OSM 笔记</string>
     <string name="quick_action_osmbugs_hide">隐藏 OSM 笔记</string>
     <string name="shared_string_add_photos">添加照片</string>
-    <string name="routing_attr_allow_private_description">允许进入私有土地</string>
+    <string name="routing_attr_allow_private_description">允许进入私有土地。</string>
     <string name="download_tab_downloads">全部下载</string>
     <string name="download_tab_local">本地</string>
     <string name="download_tab_updates">可更新</string>
@@ -1481,9 +1481,9 @@
     <string name="online_photos">在线照片</string>
     <string name="mapillary_descr">供所有人使用的在线街景照片。协作发现景点，捕捉世界之美。</string>
     <string name="distance_moving">距离已修正</string>
-    <string name="no_photos_descr">我们没有该地点的照片</string>
+    <string name="no_photos_descr">我们没有该地点的照片。</string>
     <string name="routing_attr_short_way_name">节油道路</string>
-    <string name="routing_attr_short_way_description">使用节油道路（通常更短）</string>
+    <string name="routing_attr_short_way_description">使用节油道路（通常更短）。</string>
     <string name="configure_screen_quick_action">快捷操作</string>
     <string name="shared_string_show_all">显示全部</string>
     <string name="osmand_plus_short_description_80_chars">全球移动地图浏览，以及使用离线和在线 OSM 地图进行导航</string>
@@ -1507,7 +1507,7 @@
 \n要做到這些，您需要去 Google Play 安裝 Mapillary 应用。</string>
     <string name="mapillary_action_descr">在这个地点，通过 Mapillary 贡献您的在线街景图片。</string>
     <string name="mapillary_widget">Mapillary 小工具</string>
-    <string name="mapillary_widget_descr">可以让你迅速将图片提交到 Mapillary</string>
+    <string name="mapillary_widget_descr">可以助您迅速将图片提交到 Mapillary。</string>
     <string name="mapillary">Mapillary</string>
     <string name="plugin_mapillary_descr">将街道平面照片給每个人。发现新地点、写作、获取整个世界。</string>
     <string name="quick_action_showhide_osmbugs_descr">轻点动作按钮会在地图上显示或隐藏 OSM 注解。</string>
@@ -1522,8 +1522,8 @@
     <string name="show_from_zoom_level">根据縮放等級显示</string>
     <string name="favorite_group_name">组名称</string>
     <string name="animate_my_location">动画处理我的位置</string>
-    <string name="animate_my_location_desc">在导航时为我的位置启用动画</string>
-    <string name="quick_action_add_destination_desc">轻点按鈕将在屏幕中心位置添加一个目的地。以前设定的目的地成为最后的中转点。</string>
+    <string name="animate_my_location_desc">在导航时为我的位置启用动画。</string>
+    <string name="quick_action_add_destination_desc">轻点按钮将在屏幕中心位置添加一个目的地。以前设定的目的地成为最后的中转点。</string>
     <string name="quick_action_replace_destination_desc">轻点动作按钮将吧屏幕中心的位置更换为目的地。</string>
     <string name="quick_action_add_first_intermediate_desc">轻点动作按钮将在屏幕中心位置添加一个中转点。</string>
     <string name="no_overlay">无覆盖层</string>
@@ -1543,7 +1543,7 @@
     <string name="routing_attr_driving_style_speed_name">更短的路径</string>
     <string name="routing_attr_driving_style_balance_name">平衡</string>
     <string name="routing_attr_driving_style_safety_name">偏好背街小路</string>
-    <string name="relief_smoothness_factor_descr">首选的地形︰ 平坦或丘陵</string>
+    <string name="relief_smoothness_factor_descr">首选的地形︰ 平坦或丘陵。</string>
     <string name="shared_string_slope">坡度</string>
     <string name="add_new_folder">添加新文件夹</string>
     <string name="route_points_category_name">转到这条路线上</string>
@@ -1560,8 +1560,8 @@
     <string name="average_altitude">平均海拔</string>
     <string name="routing_attr_relief_smoothness_factor_name">选择海拔波动</string>
     <string name="routing_attr_height_obstacles_name">使用标高数据</string>
-    <string name="routing_attr_height_obstacles_description">使用提供 SRTM、 ASTER 和 EU-DEM 的地形标高数据</string>
-    <string name="rendering_attr_depthContours_description">显示等深线和标记</string>
+    <string name="routing_attr_height_obstacles_description">使用 SRTM、ASTER 和 EU-DEM 提供的地形标高数据。</string>
+    <string name="rendering_attr_depthContours_description">显示等深线和标记。</string>
     <string name="rendering_attr_depthContours_name">航海等深线</string>
     <string name="auto_split_recording_title">自动拆分录音后的间隙</string>
     <string name="auto_split_recording_descr">如果日期已更改，开始新区段在6分钟后的间隙，新轨迹在2小时后的间隙，或新文件在更长的间隙之后。</string>
@@ -1657,7 +1657,7 @@
     <string name="shared_string_is_open_24_7">24小时开放</string>
     <string name="storage_directory_card">存储卡</string>
     <string name="coords_format">坐标格式</string>
-    <string name="coords_format_descr">地理坐标格式</string>
+    <string name="coords_format_descr">地理坐标的格式。</string>
     <string name="app_mode_bus">公交车</string>
     <string name="app_mode_train">火车</string>
     <string name="current_track">当前轨迹</string>
@@ -1666,7 +1666,7 @@
     <string name="access_direction_audio_feedback_descr">通过声音指示目标点方向</string>
     <string name="access_direction_haptic_feedback">方向触觉反馈</string>
     <string name="access_direction_haptic_feedback_descr">由振动指示目标点方向</string>
-    <string name="use_osm_live_routing_description">启用导航时的 OSM 实时改变 (Beta)</string>
+    <string name="use_osm_live_routing_description">启用导航时由 OsmAnd 实时服务提供的更新。</string>
     <string name="access_no_destination">未设置目的地</string>
     <string name="map_widget_magnetic_bearing">磁方位</string>
     <string name="map_widget_bearing">相对方位</string>
@@ -1902,7 +1902,7 @@
     <string name="proxy_pref_descr">设置代理互联网通信</string>
     <string name="points">点</string>
     <string name="navigation_over_track">开始沿着轨道导航吗？</string>
-    <string name="avoid_roads_msg">你可以选择一条替代路线以避免</string>
+    <string name="avoid_roads_msg">您可以选择一条需绕开的道路以触发路线重新规划</string>
     <string name="speak_pedestrian">步行街道</string>
     <string name="routing_attr_no_new_routing_name">不用 v1.9 路径规则</string>
     <string name="routing_attr_no_new_routing_description">请不要使用 v1.9 的路径规划规则</string>
@@ -2350,7 +2350,7 @@
     <string name="keep_informing_descr">定期重新通报导航指令</string>
     <string name="keep_informing">重复导航指令</string>
     <string name="auto_follow_route_navigation_descr">仅在导航时地图视图自动位于屏幕中心。</string>
-    <string name="auto_follow_location_enabled">自动将使用中的地图视图放在屏幕中间。</string>
+    <string name="auto_follow_location_enabled">自动将使用中的地图视图置中。</string>
     <string name="poi_filter_nominatim">按名称在线</string>
     <string name="select_search_position">起点：</string>
     <string name="context_menu_item_search">在这附近搜索</string>
@@ -2618,8 +2618,8 @@
     <string name="mapillary_menu_title_username">用户名</string>
     <string name="mapillary_menu_edit_text_hint">输入用户名</string>
     <string name="mapillary_menu_title_dates">日期</string>
-    <string name="mapillary_menu_descr_username">查看特定用户添加的图像。</string>
-    <string name="mapillary_menu_descr_dates">查看特定时期内添加的图像。</string>
+    <string name="mapillary_menu_descr_username">仅查看特定用户添加的图像</string>
+    <string name="mapillary_menu_descr_dates">仅查看添加的图像</string>
     <string name="mapillary_menu_filter_description">您可以根据提交者或日期过滤图像。过滤器仅在高比例尺放大时产生作用。</string>
     <string name="shared_string_reload">重新载入</string>
     <string name="shared_string_reset">重置</string>
@@ -2634,10 +2634,10 @@
     <string name="moving_time">移动时间</string>
     <string name="min_max">最小/最大</string>
     <string name="quick_action_resume_pause_navigation">继续/暂停导航</string>
-    <string name="quick_action_resume_pause_navigation_descr">点击该按钮以暂停导航，或者在已暂停时恢复导航。</string>
+    <string name="quick_action_resume_pause_navigation_descr">点击该按钮以暂停或恢复导航。</string>
     <string name="quick_action_show_navigation_finish_dialog">显示导航完成对话框</string>
-    <string name="quick_action_start_stop_navigation">开始/结束导航</string>
-    <string name="quick_action_start_stop_navigation_descr">点击该按钮以开始导航，或者在导航已经开始的情况下结束导航。</string>
+    <string name="quick_action_start_stop_navigation">开始/停止导航</string>
+    <string name="quick_action_start_stop_navigation_descr">点击该按钮以开始或结束导航。</string>
     <string name="release_2_7">\\022 带有街道等级图像的 Mapillary 插件
 \n
 \n• 用于距离测量的量尺小部件
@@ -2648,4 +2648,112 @@
 \n
 \n</string>
     <string name="rendering_value_translucent_pink_name">半透明粉红色</string>
+    <string name="empty_state_osm_edits">创建或修改 OSM 对象</string>
+    <string name="import_as_gpx">作为 GPX 文件导入</string>
+    <string name="wrong_input">错误输入</string>
+	<string name="enter_new_name">输入新名称</string>
+	<string name="shared_string_back">返回</string>
+	<string name="wrong_format">格式错误</string>
+    <string name="shared_string_road">道路</string>
+    <string name="show_map">显示地图</string>
+    <string name="osn_modify_dialog_title">修改笔记</string>
+    <string name="context_menu_item_modify_note">修改 OSM 笔记</string>
+    <string name="coordinates_format">坐标格式</string>
+    <string name="use_system_keyboard">使用系统键盘</string>
+    <string name="use_location">使用位置</string>
+    <string name="shared_string_sort">排序</string>
+    <string name="coordinate_input">坐标输入</string>
+    <string name="is_saved">已保存</string>
+    <string name="marker_save_as_track">保存为轨迹</string>
+    <string name="today">今天</string>
+    <string name="yesterday">昨天</string>
+    <string name="context_menu_read_full_article">阅读完整文章</string>
+    <string name="context_menu_read_article">阅读文章</string>
+    <string name="release_2_8">\\022 彻底重新实现了地图标记功能，带有辅助线和路径规划
+\n
+\n • 距离测量工具，提供道路吸附功能和将点保存为轨迹的功能
+\n
+\n • OsmAnd 实时：缺陷修复、每 30 分钟即从服务器更新最新数据、在导航界面中实现了更新功能
+\n
+\n</string>
+    <string name="shared_string_without_name">没有名称</string>
+    <string name="what_is_here">这里的内容:</string>
+    <string name="parked_at">停在</string>
+    <string name="pick_up_till">取得直到</string>
+    <string name="without_time_limit">没有时间限制</string>
+    <string name="context_menu_points_of_group">组中所有的点</string>
+    <string name="open_from">开始营业于</string>
+    <string name="will_close_at">将要关闭于</string>
+    <string name="will_open_at">将要打开于</string>
+    <string name="will_open_on">将要打开于</string>
+    <string name="additional_actions">额外的活动</string>
+    <string name="av_locations_selected_desc">GPX文件，包含所选笔记的坐标和数据。</string>
+    <string name="av_locations_all_desc">GPX文件，包含所有注释的坐标和数据。</string>
+    <string name="release_3_0">\\022 
+\n
+\n</string>
+    <string name="modify_the_search_query">修改搜索查询。</string>
+    <string name="shared_string_actions">操作</string>
+    <string name="shared_string_marker">标记</string>
+    <string name="empty_state_osm_edits_descr">创建或修改 OSM 兴趣点，打开或评论 OSM 笔记并贡献 GPX 轨迹文件。</string>
+    <string name="shared_string_deleted">已删除</string>
+    <string name="shared_string_edited">已编辑</string>
+    <string name="shared_string_added">已添加</string>
+    <string name="marker_activated">标记%s 已激活。</string>
+    <string name="one_tap_active_descr">点击地图上的标记将其移动到活动标记的顶端, 而不打开上下文菜单。</string>
+    <string name="one_tap_active">一个点击激活</string>
+    <string name="empty_state_av_notes">做笔记!</string>
+    <string name="empty_state_av_notes_desc">使用小部件或上下文菜单, 在地图上的每个点添加音频、视频或照片注释。</string>
+    <string name="notes_by_date">按日期说明</string>
+    <string name="by_date">按日期</string>
+    <string name="by_type">按类型</string>
+    <string name="looking_for_tracks_with_waypoints">用航路点寻找轨迹</string>
+    <string name="shared_string_more_without_dots">更多</string>
+    <string name="appearance_on_the_map">在地图上的外观</string>
+    <string name="add_track_to_markers_descr">选择一个轨迹一遍添加它的航路点到标记。（只有有航路点的轨迹才会列举出来。）</string>
+    <string name="add_favourites_group_to_markers_descr">选择一个收藏夹类别以便添加到标记。</string>
+    <string name="track_waypoints">轨迹航路点</string>
+    <string name="favourites_group">收藏夹类别</string>
+    <string name="add_group">添加组</string>
+    <string name="add_group_descr">您可以从收藏夹或轨道航点导入组。</string>
+    <string name="empty_state_markers_active">创建地图标记!</string>
+    <string name="empty_state_markers_active_desc">长按或短按位置, 然后点击标记标志按钮。</string>
+    <string name="empty_state_markers_groups">导入组群</string>
+    <string name="empty_state_markers_groups_desc">你可以导入收藏组或轨迹航点作为标记。</string>
+    <string name="empty_state_markers_history">\@string/shared_string_history</string>
+    <string name="empty_state_markers_history_desc">标记为已通过的标记将显示在此屏幕上。</string>
+    <string name="shared_string_two">二</string>
+    <string name="shared_string_one">一</string>
+    <string name="show_guide_line_descr">显示指引路线到活动的标记位置。</string>
+    <string name="show_arrows_descr">显示一个或两个箭头指示方向到活动标记。</string>
+    <string name="distance_indication_descr">选择如何显示到活动标记的距离。</string>
+    <string name="active_markers_descr">选择想显示多少的方向指标。</string>
+    <string name="digits_quantity">小数位数</string>
+    <string name="shared_string_right">右方</string>
+    <string name="shared_string_left">左方</string>
+    <string name="open_till">营业至</string>
+    <string name="none_point_error">请添加至少一个点。</string>
+    <string name="enter_gpx_name">GPX 文件名：</string>
+    <string name="show_on_map_after_saving">保存后在地图上显示</string>
+    <string name="measurement_tool_action_bar">浏览地图并添加点</string>
+    <string name="measurement_tool">测量距离</string>
+    <string name="will_open_tomorrow_at">明日开始营业时间</string>
+    <string name="rendering_attr_hidePOILabels_name">兴趣点（POI）标签</string>
+    <string name="show_number_pad">显示数字盘</string>
+    <string name="switch_osm_notes_visibility_desc">在地图上显示/隐藏 OSM 笔记。</string>
+    <string name="gpx_file_desc">GPX - 适合导出到 JOSM 或其它 OSM 编辑器。</string>
+    <string name="osc_file_desc">OSC - 适合导出到 OpenStreetMap。</string>
+    <string name="gpx_file">GPX 文件</string>
+    <string name="osc_file">OSC 文件</string>
+    <string name="choose_file_type">选择文件类型</string>
+    <string name="osm_edits_export_desc">选择导出类型：OSM 笔记、POI（兴趣点）或者同时使用两者。</string>
+    <string name="all_data">所有数据</string>
+    <string name="osm_notes">OSM 笔记</string>
+    <string name="shared_string_paste">粘贴</string>
+    <string name="tap_on_map_to_hide_interface">全屏模式</string>
+    <string name="import_file">导入文件</string>
+	<string name="mappilary_no_internet_desc">您需要互联网连接以查看来自 Mapillary 的图片。</string>
+    <string name="retry">重试</string>
+    <string name="save_gpx_waypoint">保存 GPX 航点</string>
+    <string name="import_track">导入轨迹</string>
     </resources>

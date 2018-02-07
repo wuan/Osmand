@@ -19,6 +19,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import net.osmand.AndroidUtils;
+import net.osmand.Location;
 import net.osmand.ValueHolder;
 import net.osmand.data.FavouritePoint;
 import net.osmand.data.LatLon;
@@ -122,6 +123,10 @@ public class MapRouteInfoMenu implements IRouteInformationListener {
 		this.onDismissListener = onDismissListener;
 	}
 
+	public void cancelSelectionFromMap() {
+		selectFromMapTouch = false;
+	}
+
 	public boolean onSingleTap(PointF point, RotatedTileBox tileBox) {
 		if (selectFromMapTouch) {
 			LatLon latlon = tileBox.getLatLonFromPixel(point.x, point.y);
@@ -131,7 +136,6 @@ public class MapRouteInfoMenu implements IRouteInformationListener {
 			} else {
 				getTargets().setStartPoint(latlon, true, null);
 			}
-			contextMenu.showMinimized(latlon, null, null);
 			show();
 			return true;
 		}
@@ -237,7 +241,7 @@ public class MapRouteInfoMenu implements IRouteInformationListener {
 		ViewGroup vg = (ViewGroup) parentView.findViewById(R.id.app_modes);
 		vg.removeAllViews();
 		AppModeDialog.prepareAppModeView(mapActivity, selected, false,
-				vg, true, true, new View.OnClickListener() {
+				vg, true, false,true, new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
 						if (selected.size() > 0) {
@@ -259,12 +263,16 @@ public class MapRouteInfoMenu implements IRouteInformationListener {
 	private void updateViaView(final View parentView) {
 		String via = generateViaDescription();
 		View viaLayout = parentView.findViewById(R.id.ViaLayout);
+		View viaLayoutDivider = parentView.findViewById(R.id.viaLayoutDivider);
+		ImageView swapDirectionView = (ImageView) parentView.findViewById(R.id.swap_direction_image_view);
 		if (via.length() == 0) {
 			viaLayout.setVisibility(View.GONE);
-			parentView.findViewById(R.id.viaLayoutDivider).setVisibility(View.GONE);
+			viaLayoutDivider.setVisibility(View.GONE);
+			swapDirectionView.setVisibility(View.VISIBLE);
 		} else {
+			swapDirectionView.setVisibility(View.GONE);
 			viaLayout.setVisibility(View.VISIBLE);
-			parentView.findViewById(R.id.viaLayoutDivider).setVisibility(View.VISIBLE);
+			viaLayoutDivider.setVisibility(View.VISIBLE);
 			((TextView) parentView.findViewById(R.id.ViaView)).setText(via);
 		}
 
@@ -279,6 +287,35 @@ public class MapRouteInfoMenu implements IRouteInformationListener {
 
 		ImageView viaIcon = (ImageView) parentView.findViewById(R.id.viaIcon);
 		viaIcon.setImageDrawable(getIconOrig(R.drawable.list_intermediate));
+
+		swapDirectionView.setImageDrawable(mapActivity.getMyApplication().getIconsCache().getIcon(R.drawable.ic_action_change_navigation_points,
+				isLight() ? R.color.route_info_control_icon_color_light : R.color.route_info_control_icon_color_dark));
+		swapDirectionView.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				TargetPointsHelper targetPointsHelper = getTargets();
+				TargetPoint startPoint = targetPointsHelper.getPointToStart();
+				TargetPoint endPoint = targetPointsHelper.getPointToNavigate();
+
+				if (startPoint == null) {
+					Location loc = mapActivity.getMyApplication().getLocationProvider().getLastKnownLocation();
+					if (loc != null) {
+						startPoint = TargetPoint.createStartPoint(new LatLon(loc.getLatitude(), loc.getLongitude()),
+								new PointDescription(PointDescription.POINT_TYPE_MY_LOCATION,
+										mapActivity.getString(R.string.shared_string_my_location)));
+					}
+				}
+
+				if (startPoint != null && endPoint != null) {
+					targetPointsHelper.navigateToPoint(startPoint.point, false, -1, startPoint.getPointDescription(mapActivity));
+					targetPointsHelper.setStartPoint(endPoint.point, false, endPoint.getPointDescription(mapActivity));
+					targetPointsHelper.updateRouteAndRefresh(true);
+
+					updateFromIcon();
+					updateToIcon(parentView);
+				}
+			}
+		});
 	}
 
 	private void updateToSpinner(final View parentView) {
@@ -408,16 +445,9 @@ public class MapRouteInfoMenu implements IRouteInformationListener {
 		fromDropDownIcon.setImageDrawable(mapActivity.getMyApplication().getIconsCache().getIcon(R.drawable.ic_action_arrow_drop_down, isLight()));
 	}
 
-	@SuppressWarnings("deprecation")
 	public void updateFromIcon(View parentView) {
-		TargetPointsHelper targets = getTargets();
-		ImageView fromIcon = (ImageView) parentView.findViewById(R.id.fromIcon);
-		if (targets.getPointToStart() == null) {
-			ApplicationMode appMode = mapActivity.getMyApplication().getSettings().getApplicationMode();
-			fromIcon.setImageDrawable(mapActivity.getResources().getDrawable(appMode.getResourceLocationDay()));
-		} else {
-			fromIcon.setImageDrawable(mapActivity.getMyApplication().getIconsCache().getIcon(R.drawable.list_startpoint, 0));
-		}
+		((ImageView) parentView.findViewById(R.id.fromIcon)).setImageDrawable(ContextCompat.getDrawable(mapActivity,
+				getTargets().getPointToStart() == null ? R.drawable.ic_action_location_color : R.drawable.list_startpoint));
 	}
 
 	protected void selectOnScreen(boolean target) {
@@ -438,7 +468,7 @@ public class MapRouteInfoMenu implements IRouteInformationListener {
 
 	protected void selectFavorite(final View parentView, final boolean target) {
 		final FavouritesAdapter favouritesAdapter = new FavouritesAdapter(mapActivity, mapActivity.getMyApplication()
-				.getFavorites().getFavouritePoints(), false);
+				.getFavorites().getVisibleFavouritePoints(), false);
 		Dialog[] dlgHolder = new Dialog[1];
 		OnItemClickListener click = getOnFavoriteClickListener(target, favouritesAdapter, dlgHolder);
 		OnDismissListener dismissListener = new DialogInterface.OnDismissListener() {
@@ -594,9 +624,9 @@ public class MapRouteInfoMenu implements IRouteInformationListener {
 			infoDurationView.setVisibility(View.GONE);
 			textView.setVisibility(View.VISIBLE);
 		} else {
-			infoIcon.setImageDrawable(ctx.getIconsCache().getIcon(R.drawable.ic_action_polygom_dark, isLight()));
+			infoIcon.setImageDrawable(ctx.getIconsCache().getIcon(R.drawable.ic_action_route_distance, R.color.route_info_unchecked_mode_icon_color));
 			infoIcon.setVisibility(View.VISIBLE);
-			durationIcon.setImageDrawable(ctx.getIconsCache().getIcon(R.drawable.ic_action_time, isLight()));
+			durationIcon.setImageDrawable(ctx.getIconsCache().getIcon(R.drawable.ic_action_time_span, R.color.route_info_unchecked_mode_icon_color));
 			durationIcon.setVisibility(View.VISIBLE);
 			infoDistanceView.setVisibility(View.VISIBLE);
 			infoDurationView.setVisibility(View.VISIBLE);

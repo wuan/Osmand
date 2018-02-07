@@ -14,7 +14,6 @@ import android.support.v4.content.ContextCompat;
 
 import net.osmand.data.LatLon;
 import net.osmand.data.PointDescription;
-import net.osmand.data.QuadPoint;
 import net.osmand.data.RotatedTileBox;
 import net.osmand.plus.R;
 import net.osmand.plus.TargetPointsHelper;
@@ -22,7 +21,6 @@ import net.osmand.plus.TargetPointsHelper.TargetPoint;
 import net.osmand.plus.activities.MapActivity;
 import net.osmand.plus.views.ContextMenuLayer.IContextMenuProvider;
 
-import java.util.Iterator;
 import java.util.List;
 
 public class PointNavigationLayer extends OsmandMapLayer implements
@@ -181,11 +179,16 @@ public class PointNavigationLayer extends OsmandMapLayer implements
 	}
 
 	@Override
-	public void collectObjectsFromPoint(PointF point, RotatedTileBox tileBox, List<Object> o) {
+	public boolean runExclusiveAction(Object o, boolean unknownLocation) {
+		return false;
+	}
+
+	@Override
+	public void collectObjectsFromPoint(PointF point, RotatedTileBox tileBox, List<Object> o, boolean unknownLocation) {
 		if (tileBox.getZoom() >= 3) {
 			TargetPointsHelper tg = map.getMyApplication().getTargetPointsHelper();
 			List<TargetPoint> intermediatePoints = tg.getAllPoints();
-			int r = getRadiusPoi(tileBox);
+			int r = getDefaultRadiusPoi(tileBox);
 			for (int i = 0; i < intermediatePoints.size(); i++) {
 				TargetPoint tp = intermediatePoints.get(i);
 				LatLon latLon = tp.point;
@@ -206,21 +209,6 @@ public class PointNavigationLayer extends OsmandMapLayer implements
 		return Math.abs(objx - ex) <= radius && (ey - objy) <= radius && (objy - ey) <= 2.5 * radius;
 	}
 
-	public int getRadiusPoi(RotatedTileBox tb) {
-		int r;
-		final double zoom = tb.getZoom();
-		if (zoom <= 15) {
-			r = 10;
-		} else if (zoom <= 16) {
-			r = 14;
-		} else if (zoom <= 17) {
-			r = 16;
-		} else {
-			r = 18;
-		}
-		return (int) (r * tb.getDensity());
-	}
-
 	@Override
 	public LatLon getObjectLocation(Object o) {
 		if (o instanceof TargetPoint) {
@@ -239,8 +227,11 @@ public class PointNavigationLayer extends OsmandMapLayer implements
 
 	@Override
 	public boolean isObjectMovable(Object o) {
-		TargetPointsHelper targetPoints = map.getMyApplication().getTargetPointsHelper();
-		return o == targetPoints.getPointToNavigate();
+		if (o != null && o instanceof TargetPoint) {
+			TargetPointsHelper targetPointsHelper = map.getMyApplication().getTargetPointsHelper();
+			return targetPointsHelper.getAllPoints().contains(o);
+		}
+		return false;
 	}
 
 	@Override
@@ -250,8 +241,24 @@ public class PointNavigationLayer extends OsmandMapLayer implements
 		TargetPoint newTargetPoint = null;
 		if (o instanceof TargetPoint) {
 			TargetPointsHelper targetPointsHelper = map.getMyApplication().getTargetPointsHelper();
-			targetPointsHelper.navigateToPoint(position, true, -1, new PointDescription(PointDescription.POINT_TYPE_LOCATION, ""));
-			newTargetPoint = targetPointsHelper.getPointToNavigate();
+			TargetPoint oldPoint = (TargetPoint) o;
+			if (oldPoint.start) {
+				targetPointsHelper.setStartPoint(position, true, null);
+				newTargetPoint = targetPointsHelper.getPointToStart();
+			} else if (oldPoint == targetPointsHelper.getPointToNavigate()) {
+				targetPointsHelper.navigateToPoint(position, true, -1, null);
+				newTargetPoint = targetPointsHelper.getPointToNavigate();
+			} else if (oldPoint.intermediate) {
+				List<TargetPoint> points = targetPointsHelper.getIntermediatePointsWithTarget();
+				int i = points.indexOf(oldPoint);
+				if (i != -1) {
+					newTargetPoint = new TargetPoint(position,
+							new PointDescription(PointDescription.POINT_TYPE_LOCATION, ""));
+					points.set(i, newTargetPoint);
+					targetPointsHelper.reorderAllTargetPoints(points, true);
+				}
+
+			}
 			result = true;
 		}
 		if (callback != null) {

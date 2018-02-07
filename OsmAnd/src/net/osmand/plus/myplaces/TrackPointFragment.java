@@ -580,14 +580,16 @@ public class TrackPointFragment extends OsmandExpandableListFragment {
 	private void syncGpx(GPXFile gpxFile) {
 		File gpx = new File(gpxFile.path);
 		if (gpx.exists()) {
-			app.getMapMarkersHelper().syncGroup(new MarkersSyncGroup(gpx.getAbsolutePath(),
+			app.getMapMarkersHelper().syncGroupAsync(new MarkersSyncGroup(gpx.getAbsolutePath(),
 					AndroidUtils.trimExtension(gpx.getName()), MarkersSyncGroup.GPX_TYPE));
 		}
 	}
 
 	private void enterMapMarkersMode() {
 		if (getSettings().USE_MAP_MARKERS.get()) {
-			addMapMarkersSyncGroup();
+			if (getGpxDataItem() != null) {
+				addMapMarkersSyncGroup();
+			}
 		} else {
 			actionMode = getActionBarActivity().startSupportActionMode(new ActionMode.Callback() {
 
@@ -630,10 +632,10 @@ public class TrackPointFragment extends OsmandExpandableListFragment {
 	private void addMapMarkersSyncGroup() {
 		MapMarkersHelper markersHelper = app.getMapMarkersHelper();
 		File gpx = getGpxDataItem().getFile();
-		MarkersSyncGroup syncGroup = new MarkersSyncGroup(gpx.getAbsolutePath(),
+		final MarkersSyncGroup syncGroup = new MarkersSyncGroup(gpx.getAbsolutePath(),
 				AndroidUtils.trimExtension(gpx.getName()), MarkersSyncGroup.GPX_TYPE);
 		markersHelper.addMarkersSyncGroup(syncGroup);
-		markersHelper.syncGroup(syncGroup);
+		markersHelper.syncGroupAsync(syncGroup);
 		GPXFile gpxFile = getTrackActivity().getGpx();
 		if (gpxFile != null) {
 			app.getSelectedGpxHelper().selectGpxFile(gpxFile, true, false);
@@ -645,7 +647,9 @@ public class TrackPointFragment extends OsmandExpandableListFragment {
 				.setAction(getResources().getString(R.string.view), new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						MapActivity.launchMapActivityMoveToTop(getTrackActivity(), MapMarkersDialogFragment.OPEN_MAP_MARKERS_GROUPS);
+						Bundle args = new Bundle();
+						args.putString(MarkersSyncGroup.MARKERS_SYNC_GROUP_ID, syncGroup.getId());
+						MapActivity.launchMapActivityMoveToTop(getTrackActivity(), MapMarkersDialogFragment.OPEN_MAP_MARKERS_GROUPS, args);
 					}
 				});
 		snackbar.addCallback(new Snackbar.Callback() {

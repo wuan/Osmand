@@ -222,7 +222,7 @@
 	<string name="poi_fuel_biogas">Biyogaz</string>
 	<string name="poi_fuel_lh2">Sıvı hidrojen</string>
 	<string name="poi_fuel_electricity">Elektrik</string>
-	<string name="poi_charging_station">Şarj istasyonu</string>
+	<string name="poi_electricity_combined_charging">Şarj istasyonu</string>
 	<string name="poi_vehicle_ramp">Araç rampa</string>
 	<string name="poi_compressed_air">Basınçlı hava</string>
 	<string name="poi_parking">Otopark</string>
@@ -1048,7 +1048,7 @@
 
 	<string name="poi_additional_atm_yes">Atm: evet</string>
 	<string name="poi_medical_system_unknown_yes">Tıp sistemi: bilinmeyen geleneksel</string>
-	<string name="poi_fuel_type">Tür</string>
+	<string name="poi_fuel_type">Yakıt türü</string>
 	<string name="poi_fuel_avia_type">Tür</string>
 	<string name="poi_payment_type">Ödeme türü</string>
 	<string name="poi_payment_fuel_type">Benzin kartı</string>

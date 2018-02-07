@@ -41,7 +41,7 @@ public class MapPoiTypes {
 	private boolean init;
 	Map<String, PoiType> poiTypesByTag = new LinkedHashMap<String, PoiType>();
 	Map<String, String> deprecatedTags = new LinkedHashMap<String, String>();
-	Map<String, String> poiAdditionalCategoryIcons = new LinkedHashMap<String, String>();
+	Map<String, String> poiAdditionalCategoryIconNames = new LinkedHashMap<String, String>();
 	List<PoiType> textPoiAdditionals = new ArrayList<PoiType>();
 
 
@@ -92,8 +92,8 @@ public class MapPoiTypes {
 		return otherMapCategory;
 	}
 
-	public String getPoiAdditionalCategoryIcon(String category) {
-		return poiAdditionalCategoryIcons.get(category);
+	public String getPoiAdditionalCategoryIconName(String category) {
+		return poiAdditionalCategoryIconNames.get(category);
 	}
 
 	public List<PoiType> getTextPoiAdditionals() {
@@ -379,7 +379,7 @@ public class MapPoiTypes {
 							lastPoiAdditionalCategory = parser.getAttributeValue("", "name");
 							String icon = parser.getAttributeValue("", "icon");
 							if (!Algorithms.isEmpty(icon)) {
-								poiAdditionalCategoryIcons.put(lastPoiAdditionalCategory, icon);
+								poiAdditionalCategoryIconNames.put(lastPoiAdditionalCategory, icon);
 							}
 						}
 
@@ -814,6 +814,12 @@ public class MapPoiTypes {
 			if (!otag.equals(tag) && !otag.equals("name")) {
 				PoiType pat = poiTypesByTag.get(otag + "/" + e.getValue());
 				if (pat == null) {
+					for(String splValue : e.getValue().split(";")) {
+						PoiType ps = poiTypesByTag.get(otag + "/" + splValue.trim());
+						if(ps != null) {
+							a.setAdditionalInfo(ps.getKeyName(), splValue.trim());
+						}
+					}
 					pat = poiTypesByTag.get(otag);
 				}
 				if (pat != null && pat.isAdditional()) {

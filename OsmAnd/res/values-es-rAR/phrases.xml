@@ -125,7 +125,7 @@
 	<string name="poi_toys">Juguetería</string>
 	<string name="poi_trade">Corralón</string>
 	<string name="poi_vacuum_cleaner">Aspiradoras</string>
-	<string name="poi_variety_store">Todo por $2</string>
+	<string name="poi_variety_store">Bazar (todo por $2)</string>
 	<string name="poi_video">Videoclub</string>
 	<string name="poi_window_blind">Persianas</string>
 	<string name="poi_department_store">Grandes almacenes</string>
@@ -194,7 +194,7 @@
 	<string name="poi_fuel_biogas">Biogás</string>
 	<string name="poi_fuel_lh2">Hidrógeno líquido</string>
 	<string name="poi_fuel_electricity">Electricidad</string>
-	<string name="poi_charging_station">Estación de carga</string>
+	<string name="poi_electricity_combined_charging">Estación de carga</string>
 	<string name="poi_vehicle_ramp">Rampa de vehículos</string>
 	<string name="poi_compressed_air">Aire comprimido</string>
 	<string name="poi_parking">Estacionamiento</string>
@@ -210,7 +210,7 @@
 	<string name="poi_public_transport_platform_tram">Parada de tranvía</string>
 	<string name="poi_tram_stop">Parada de tranvía</string>
 	<string name="poi_public_transport_station">Estación de transporte público</string>
-	<string name="poi_bus_station">Estación de colectivo</string>
+	<string name="poi_bus_station">Estación de colectivos</string>
 	<string name="poi_railway_station">Estación de tren</string>
 	<string name="poi_railway_platform">Andén de tren</string>
 	<string name="poi_halt">Parada de tren</string>
@@ -316,7 +316,7 @@
 	<string name="poi_silo">Silo</string>
 	<string name="poi_storage_tank">Tanque de almacenamiento</string>
 
-	<string name="poi_college">Instituto educativo</string>
+	<string name="poi_college">Instituto superior</string>
 	<string name="poi_driving_school">Autoescuela</string>
 	<string name="poi_kindergarten">Jardín de infantes</string>
 	<string name="poi_school">Escuela</string>
@@ -620,7 +620,7 @@
 	<string name="poi_bar">Bar</string>
 	<string name="poi_pub">Pub</string>
 	<string name="poi_food_court">Patio de comidas</string>
-	<string name="poi_drinking_water">Agua potable</string>
+	<string name="poi_drinking_water">Bebedero de agua potable</string>
 	<string name="poi_barbecue">Parrillero</string>
 
 	<string name="poi_craft_agricultural_engines">Motores agrícolas</string>
@@ -1307,7 +1307,7 @@
 	<string name="poi_tactile_paving_yes">Sí</string>
 	<string name="poi_tactile_paving_no">Pavimento táctil: No</string>
 	<string name="poi_traffic_signals_sound_yes">Sí</string>
-	<string name="poi_traffic_signals_sound_no">No</string>
+	<string name="poi_traffic_signals_sound_no">Sonoro: No</string>
 	<string name="poi_traffic_signals_sound_walk">Sólo se permite al caminar</string>
 
 <string name="poi_retail">Área comercial</string>
@@ -1600,7 +1600,7 @@
 	<string name="poi_drive_through_yes">Sí</string>
 	<string name="poi_drive_through_no">Servicio en el automóvil: No</string>
 
-	<string name="poi_brewery_additional">Nombre de cervecería</string>
+	<string name="poi_brewery_additional">Nombre de la cervecería</string>
 	<string name="poi_microbrewery_yes">Sí</string>
 	<string name="poi_microbrewery_no">Cerveza artesanal: No</string>
 
@@ -1641,11 +1641,11 @@
 	<string name="poi_public_bath">Baño público</string>
 
 	<string name="poi_male_yes">Masculino</string>
-	<string name="poi_male_no">Prohibido para hombres</string>
+	<string name="poi_male_no">Hombres: Prohibido</string>
 	<string name="poi_female_yes">Femenino</string>
-	<string name="poi_female_no">Prohibido para mujeres</string>
+	<string name="poi_female_no">Mujeres: Prohibido</string>
 	<string name="poi_indoor_yes">Cubierto (interior)</string>
-	<string name="poi_indoor_no">Al aire libre</string>
+	<string name="poi_indoor_no">Al aire libre: Sí</string>
 	<string name="poi_toilets_yes">Sí</string>
 	<string name="poi_toilets_no">Baños: No</string>
 	<string name="poi_toilets_wheelchair_yes">Baños para personas en sillas de rueda: Sí</string>
@@ -1788,7 +1788,7 @@
 	<string name="poi_chimney">Chimenea</string>
 	<string name="poi_palm">Palmera</string>
 	<string name="poi_cypress">Ciprés</string>
-	<string name="poi_flagpole">Mástil de bandera</string>
+	<string name="poi_flagpole">Asta de bandera</string>
 
 	<string name="poi_bench_yes">Sí</string>
 	<string name="poi_bench_no">Bancos (asientos): No</string>
@@ -2073,7 +2073,7 @@
 	<string name="poi_clothes_wedding">Vestidos de novia</string>
 	<string name="poi_clothes_sports">Deportiva</string>
 	<string name="poi_clothes_babies">De bebes</string>
-	<string name="poi_clothes_workwear">De trabajo</string>
+	<string name="poi_clothes_workwear">Laboral</string>
 	<string name="poi_clothes_hats">Sombreros</string>
 	<string name="poi_clothes_fur">De piel</string>
 	<string name="poi_clothes_leather">De cuero</string>
@@ -2151,8 +2151,8 @@
 
 	<string name="poi_capacity_tents">Carpas máximas</string>
 	<string name="poi_capacity_caravans">Casas rodante máximas</string>
-	<string name="poi_dog_yes">Permitido perros</string>
-	<string name="poi_dog_no">Prohibido perros</string>
+	<string name="poi_dog_yes">Perros: Permitido</string>
+	<string name="poi_dog_no">Perros: Prohibido</string>
 
 <string name="poi_power_supply_cee_17_blue">Fuente de alimentación (enchufe): CEE 17 azul</string>
 	<string name="poi_refugee_yes">Servicios para refugiados</string>
@@ -2267,10 +2267,10 @@
 	<string name="poi_animal_training_dog">Canino</string>
 	<string name="poi_animal_training_horse">Equino</string>
 
-	<string name="poi_horse_yes">Permitido caballos</string>
-	<string name="poi_horse_no">Prohibido caballos</string>
-	<string name="poi_animal_yes">Permitido animales</string>
-	<string name="poi_animal_no">Prohibido animales</string>
+	<string name="poi_horse_yes">Caballos: Permitido</string>
+	<string name="poi_horse_no">Caballos: Prohibido</string>
+	<string name="poi_animal_yes">Animales: Permitido</string>
+	<string name="poi_animal_no">Animales: Prohibido</string>
 
 	<string name="poi_historic_period_nuragic">Período histórico: Nurágico</string>
 	<string name="poi_historic_period_stone_bronze_undetermined">Período histórico: Edad de piedra/bronce (indeterminado)</string>
@@ -3550,7 +3550,7 @@
 	<string name="poi_vhf">Canal VHF</string>
 
 <string name="poi_gorge">Cañón (desfiladero)</string>
-	<string name="poi_couloir">Barranco estrecho</string>
+	<string name="poi_couloir">Couloir (barranco estrecho y empinado)</string>
 	<string name="poi_mountain_area">Área montañosa</string>
 
 	<string name="poi_surface_clay">Polvo de ladrillo</string>
@@ -3696,5 +3696,86 @@
 	<string name="poi_map_size_site">Tamaño del mapa: Sitio</string>
 	<string name="poi_map_size_city">Tamaño del mapa: Ciudad</string>
 	<string name="poi_map_size_region">Tamaño del mapa: Región</string>
+
+<string name="poi_charging_station_filter">Estación de carga</string>
+
+<string name="poi_depot">Depósito</string>
+
+<string name="poi_letter_box">Buzón postal</string>
+	<string name="poi_post_street">Calle</string>
+	<string name="poi_post_housenumber">Número de portal</string>
+	<string name="poi_post_flats">Pisos de oficina</string>
+
+<string name="poi_payment_centre">Centro de pagos</string>
+	<string name="poi_money_transfer">Transferencia de dinero</string>
+
+<string name="poi_route_subway_ref">Subte</string>
+
+	<string name="poi_climbing_style">Estilo de escalada</string>
+
+<string name="poi_ref_post">Código postal</string>
+
+	<string name="poi_climbing_sport_yes">Deportiva: Sí</string>
+	<string name="poi_climbing_sport_no">Deportiva: No</string>
+	<string name="poi_climbing_boulder_yes">Escalada en bloque: Sí</string>
+	<string name="poi_climbing_boulder_no">Escalada en bloque: No</string>
+	<string name="poi_climbing_toprope_yes">Moulinette: Sí</string>
+	<string name="poi_climbing_toprope_no">Moulinette: No</string>
+	<string name="poi_climbing_trad_yes">Tradicional: Sí</string>
+	<string name="poi_climbing_trad_no">Tradicional: No</string>
+	<string name="poi_climbing_multipitch_yes">Rutas multipaso: Sí</string>
+	<string name="poi_climbing_multipitch_no">Rutas multipaso: No</string>
+	<string name="poi_climbing_ice_yes">Hielo: Sí</string>
+	<string name="poi_climbing_ice_no">Hielo: No</string>
+	<string name="poi_climbing_mixed_yes">Mixto: Sí</string>
+	<string name="poi_climbing_mixed_no">Mixto: No</string>
+	<string name="poi_climbing_deepwater_yes">Psicobloc: Sí</string>
+	<string name="poi_climbing_deepwater_no">Psicobloc: No</string>
+
+	<string name="poi_climbing_length">Longitud de escalada</string>
+	<string name="poi_climbing_length_min">Longitud mínima de escalada</string>
+	<string name="poi_climbing_length_max">Longitud máxima de escalada</string>
+	<string name="poi_climbing_rock_limestone">Escalada en roca: Piedra caliza</string>
+	<string name="poi_climbing_rock_granite">Escalada en roca: Granito</string>
+	<string name="poi_climbing_rock_sandstone">Escalada en roca: Arenisca</string>
+	<string name="poi_climbing_rock_quartzite">Escalada en roca: Cuarcita</string>
+	<string name="poi_climbing_rock_gneiss">Escalada en roca: Gneís</string>
+	<string name="poi_climbing_rock_porphyry">Escalada en roca: Pórfido</string>
+	<string name="poi_climbing_quality_solid">Calidad de la escalada: Sólido</string>
+	<string name="poi_climbing_quality_fragile">Calidad de la escalada: Frágil</string>
+	<string name="poi_climbing_bolted_yes">Anclajes fijos: Sí</string>
+	<string name="poi_climbing_bolted_no">Anclajes fijos: No</string>
+	<string name="poi_climbing_orientation_n">Orientación del muro: N</string>
+	<string name="poi_climbing_orientation_ne">Orientación del muro: NE</string>
+	<string name="poi_climbing_orientation_e">Orientación del muro: E</string>
+	<string name="poi_climbing_orientation_se">Orientación del muro: SE</string>
+	<string name="poi_climbing_orientation_s">Orientación del muro: S</string>
+	<string name="poi_climbing_orientation_sw">Orientación del muro: SO</string>
+	<string name="poi_climbing_orientation_w">Orientación del muro: O</string>
+	<string name="poi_climbing_orientation_nw">Orientación del muro: NO</string>
+	<string name="poi_climbing_summit_log_yes">Registro de la escalada en la cumbre: Sí</string>
+	<string name="poi_climbing_summit_log_no">Registro de la escalada en la cumbre: No</string>
+	<string name="poi_climbing_routes">Rutas de escalada</string>
+
+
+<string name="poi_circumference">Circunferencia</string>
+	<string name="poi_diameter_crown">Diámetro de la corona</string>
+
+	<string name="poi_meadow_agricultural">Tipo: Agrícola</string>
+	<string name="poi_meadow_perpetual">Tipo: Perpetuo</string>
+	<string name="poi_meadow_transitional">Tipo: Temporario</string>
+	<string name="poi_meadow_pasture">Tipo: Pasto</string>
+
+	<string name="poi_frozen_food">Alimentos congelados</string>
+
+	<string name="poi_agrarian">Almacén agrícola</string>
+
+
+<string name="poi_shop_fireplace">Venta de chimeneas y estufas</string>
+
+	<string name="poi_shop_boat">Tienda de embarcaciones</string>
+
+	<string name="poi_cannabis">Venta de cannabis</string>
+
 
 </resources>

@@ -1,5 +1,23 @@
 package net.osmand.plus.render;
 
+import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+import net.osmand.IProgress;
+import net.osmand.IndexConstants;
+import net.osmand.PlatformUtil;
+import net.osmand.plus.OsmandApplication;
+import net.osmand.plus.R;
+import net.osmand.render.RenderingRuleProperty;
+import net.osmand.render.RenderingRulesStorage;
+import net.osmand.render.RenderingRulesStorage.RenderingRulesStorageResolver;
+import net.osmand.util.Algorithms;
+
+import org.apache.commons.logging.Log;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -10,19 +28,6 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
-
-import net.osmand.IProgress;
-import net.osmand.IndexConstants;
-import net.osmand.PlatformUtil;
-import net.osmand.plus.OsmandApplication;
-import net.osmand.render.RenderingRuleProperty;
-import net.osmand.render.RenderingRulesStorage;
-import net.osmand.render.RenderingRulesStorage.RenderingRulesStorageResolver;
-import net.osmand.util.Algorithms;
-
-import org.apache.commons.logging.Log;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
 
 
 public class RendererRegistry {
@@ -240,6 +245,19 @@ public class RendererRegistry {
 		names.addAll(internalRenderers.keySet());
 		names.addAll(externalRenderers.keySet());
 		return names;
+	}
+
+	@Nullable
+	public static String getTranslatedRendererName(@NonNull Context ctx, @NonNull String key) {
+		switch (key) {
+			case TOURING_VIEW:
+				return ctx.getString(R.string.touring_view_renderer);
+			case WINTER_SKI_RENDER:
+				return ctx.getString(R.string.winter_and_ski_renderer);
+			case NAUTICAL_RENDER:
+				return ctx.getString(R.string.nautical_renderer);
+		}
+		return null;
 	}
 
 	public RenderingRulesStorage getCurrentSelectedRenderer() {

@@ -18,6 +18,7 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import net.osmand.plus.MapMarkersHelper;
@@ -28,6 +29,7 @@ import net.osmand.plus.activities.MapActivity;
 import net.osmand.plus.mapmarkers.adapters.MapMarkerHeaderViewHolder;
 import net.osmand.plus.mapmarkers.adapters.MapMarkerItemViewHolder;
 import net.osmand.plus.mapmarkers.adapters.MapMarkersHistoryAdapter;
+import net.osmand.plus.widgets.EmptyStateRecyclerView;
 
 public class MapMarkersHistoryFragment extends Fragment implements MapMarkersHelper.MapMarkerChangedListener {
 
@@ -73,9 +75,8 @@ public class MapMarkersHistoryFragment extends Fragment implements MapMarkersHel
 			((HistoryMarkerMenuBottomSheetDialogFragment) historyMarkerMenuFragment).setListener(createHistoryMarkerMenuListener());
 		}
 
-		final RecyclerView recyclerView = new RecyclerView(getContext());
-		recyclerView.setPadding(0, 0, 0, (int) mapActivity.getResources().getDimension(R.dimen.map_markers_recycler_view_padding_bottom));
-		recyclerView.setClipToPadding(false);
+		final View mainView = inflater.inflate(R.layout.fragment_map_markers_history, container, false);
+		final EmptyStateRecyclerView recyclerView = (EmptyStateRecyclerView) mainView.findViewById(R.id.list);
 		recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
 		ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
@@ -157,7 +158,6 @@ public class MapMarkersHistoryFragment extends Fragment implements MapMarkersHel
 						app.getMapMarkersHelper().removeMarker((MapMarker) item);
 						snackbarStringRes = R.string.item_removed;
 					}
-					adapter.notifyItemRemoved(pos);
 					snackbar = Snackbar.make(viewHolder.itemView, snackbarStringRes, Snackbar.LENGTH_LONG)
 							.setAction(R.string.shared_string_undo, new View.OnClickListener() {
 								@Override
@@ -203,11 +203,15 @@ public class MapMarkersHistoryFragment extends Fragment implements MapMarkersHel
 				}
 			}
 		});
+		final View emptyView = mainView.findViewById(R.id.empty_view);
+		ImageView emptyImageView = (ImageView) emptyView.findViewById(R.id.empty_state_image_view);
+		emptyImageView.setImageResource(night ? R.drawable.ic_empty_state_marker_history_night : R.drawable.ic_empty_state_marker_history_day);
+		recyclerView.setEmptyView(emptyView);
 		recyclerView.setAdapter(adapter);
 
 		app.getMapMarkersHelper().addListener(this);
 
-		return recyclerView;
+		return mainView;
 	}
 
 	void hideSnackbar() {
@@ -226,7 +230,6 @@ public class MapMarkersHistoryFragment extends Fragment implements MapMarkersHel
 				Object item = adapter.getItem(pos);
 				if (item instanceof MapMarker) {
 					app.getMapMarkersHelper().restoreMarkerFromHistory((MapMarker) item, 0);
-					adapter.notifyItemRemoved(pos);
 				}
 			}
 
@@ -235,7 +238,6 @@ public class MapMarkersHistoryFragment extends Fragment implements MapMarkersHel
 				Object item = adapter.getItem(pos);
 				if (item instanceof MapMarker) {
 					app.getMapMarkersHelper().removeMarker((MapMarker) item);
-					adapter.notifyItemRemoved(pos);
 				}
 			}
 		};

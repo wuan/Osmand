@@ -124,7 +124,7 @@
 	<string name="poi_vehicle_inspection">Stacja diagnostyczna</string>
 	<string name="poi_car_wash">Myjnia samochodowa</string>
 	<string name="poi_fuel">Stacja benzynowa</string>
-	<string name="poi_charging_station">Stacja ładowania</string>
+	<string name="poi_electricity_combined_charging">Stacja ładowania</string>
 	<string name="poi_vehicle_ramp">Podnośnik</string>
 	<string name="poi_compressed_air">Kompresor</string>
 	<string name="poi_parking">Parking</string>
@@ -227,7 +227,7 @@
 	<string name="poi_driving_school">Szkoła nauki jazdy</string>
 	<string name="poi_school">Szkoła</string>
 	<string name="poi_kindergarten">Przedszkole</string>
-	<string name="poi_college">Kolegium</string>
+	<string name="poi_college">Uczelnia</string>
 	<string name="poi_university">Uniwersytet</string>
 
 	<string name="poi_social_facility">Placówka społeczna</string>
@@ -715,7 +715,7 @@
 	<string name="poi_craft_boatbuilder">Stocznia</string>
 	<string name="poi_craft_jeweller">Jubiler</string>
 	<string name="poi_transport_construction">Roboty drogowe</string>
-		<string name="poi_base">Miejsce do base jumpingu</string>
+		<string name="poi_base">Skoki spadochronowe</string>
 	<string name="poi_ice_stock">Ice stock</string>
 	<string name="poi_artwork">Dzieło sztuki</string>
 	<string name="poi_attraction_amusement_ride">Karuzela</string>
@@ -886,7 +886,7 @@
 	<string name="poi_breakwater">Falochron</string>
 	<string name="poi_groyne">Ostroga brzegowa</string>
 
-	<string name="poi_basin">Basen</string>
+	<string name="poi_basin">Zbiornik wodny</string>
 	<string name="poi_conservation">Obszar chroniony</string>
 
 	<string name="poi_crane">Dźwig</string>
@@ -1197,7 +1197,7 @@
 	<string name="poi_denomination_adventist">Adwentyści</string>
 	<string name="poi_denomination_nazarene">Kościół Nazarejczyka</string>
 	<string name="poi_denomination_old_believers">Staroobrzędowcy</string>
-	<string name="poi_denomination_serbian_orthodox">Serbski ortodoksyjny</string>
+	<string name="poi_denomination_serbian_orthodox">Serbski prawosławny</string>
 	<string name="poi_denomination_armenian_apostolic">Apostolski Kościół Ormiański</string>
 	<string name="poi_denomination_dutch_reformed">Holenderski Kościół Reformowany</string>
 	<string name="poi_denomination_apostolic">Kościół Apostolski</string>
@@ -1361,7 +1361,7 @@
 	<string name="poi_tomb_tumulus">Typ: kurchan</string>
 	<string name="poi_tomb_mausoleum">Typ: mauzoleum</string>
 	<string name="poi_clothes_socks">Skarpetki</string>
-	<string name="poi_clothes_shirts">Koszulki</string>
+	<string name="poi_clothes_shirts">Koszule</string>
 	<string name="poi_historic_milestone">Zabytkowy kamień milowy</string>
 
 	<string name="poi_clothes_leather">Skóra</string>
@@ -1449,7 +1449,7 @@
 	<string name="poi_massage_thai">Tajski</string>
 	<string name="poi_massage_sexual">Erotyczny</string>
 	<string name="poi_massage_chinese">Chiński</string>
-	<string name="poi_massage_therapeutic">Tterapeutyczny</string>
+	<string name="poi_massage_therapeutic">Terapeutyczny</string>
 
 	<string name="poi_handrail_yes">Poręcz: tak</string>
 	<string name="poi_handrail_no">Poręcz: nie</string>
@@ -1675,7 +1675,7 @@
 	<string name="poi_capacity_disabled">Specjalnych miejsc dla niepełnosprawnych</string>
 	<string name="poi_capacity_women_yes">Ze specjalnymi miejscami dla kobiet</string>
 	<string name="poi_capacity_women_no">Bez specjalnych miejsc dla kobiet</string>
-	<string name="poi_capacity_women">Specjalnych miejsc dla kobiet</string>
+	<string name="poi_capacity_women">Ze specjalnymi miejscami dla kobiet</string>
 	<string name="poi_capacity_pupils">Specjalnych miejsc dla uczniów</string>
 	<string name="poi_capacity_teachers">Specjalnych miejsc dla nauczycieli</string>
 	<string name="poi_capacity_parent_yes">Ze specjalnymi miejscami dla rodziców</string>
@@ -2545,7 +2545,7 @@
 
 	<string name="poi_bicycle_parking_lockers">Szafki</string>
 	<string name="poi_bicycle_parking_tree">Wieszak rowerowy</string>
-	<string name="poi_bicycle_parking_streetpod">Pół-otwarty stojak</string>
+	<string name="poi_bicycle_parking_streetpod">Półotwarty stojak</string>
 
 	<string name="poi_salt_yes">Słona woda</string>
 	<string name="poi_salt_no">Słodka woda</string>
@@ -3036,7 +3036,7 @@
 
 <string name="poi_deadlock">Zastój</string>
 
-	<string name="poi_fuel_type">Rodzaj</string>
+	<string name="poi_fuel_type">Rodzaj paliwa</string>
 	<string name="poi_payment_type">Metoda płatności</string>
 	<string name="poi_additional_type">Dodatkowy</string>
 <string name="poi_shop_craft">Sklep z materiałami dla rzemieślników</string>
@@ -3044,7 +3044,7 @@
 	<string name="poi_service_bicycle_charging_yes">Ładowanie: tak</string>
 	<string name="poi_service_bicycle_charging_no">Ładowanie: nie</string>
 
-<string name="poi_fuel_avia_type">Rodzaj</string>
+<string name="poi_fuel_avia_type">Rodzaj paliwa (avia)</string>
 	<string name="poi_payment_fuel_type">Karty paliwowe</string>
 	<string name="poi_internet_access_type">Dostęp do Internetu</string>
 	<string name="poi_vending_type">Sprzedaż</string>
@@ -3172,7 +3172,7 @@
 	<string name="poi_cuisine_cake">Ciasta</string>
 	<string name="poi_cuisine_pancake">Naleśniki</string>
 	<string name="poi_cuisine_pasta">Spaghetti i makarony</string>
-	<string name="poi_cuisine_fast_food">Szybkie żarcie</string>
+	<string name="poi_cuisine_fast_food">Fast-food</string>
 	<string name="poi_cuisine_juice">Soki</string>
 	<string name="poi_cuisine_soba">Soba (makaron z mąki gryczanej)</string>
 	<string name="poi_cuisine_fine_dining">Ekskluzywne dania</string>
@@ -3229,7 +3229,7 @@
 	<string name="poi_shower_filter_yes">Tak</string>
 
 <string name="poi_takeaway_filter_yes">Tak</string>
-	<string name="poi_diet_lactose_free_filter_yes">Bez-laktozowa</string>
+	<string name="poi_diet_lactose_free_filter_yes">Bezlaktozowa</string>
 	<string name="poi_diet_halal_filter_yes">Halal</string>
 	<string name="poi_diet_kosher_filter_yes">Koszerne potrawy</string>
 	<string name="poi_diet_gluten_free_filter_yes">Bezglutenowa</string>
@@ -3669,5 +3669,62 @@
 	<string name="poi_map_size_site">Rozmiar mapy: lokalna</string>
 	<string name="poi_map_size_city">Rozmiar mapy: miasto</string>
 	<string name="poi_map_size_region">Rozmiar mapy: region</string>
+
+<string name="poi_charging_station_filter">Stacja ładowania</string>
+
+<string name="poi_letter_box">Skrzynka na listy</string>
+	<string name="poi_post_street">Ulica</string>
+	<string name="poi_post_housenumber">Numer budynku</string>
+	<string name="poi_post_flats">Mieszkania</string>
+
+	<string name="poi_payment_centre">Centrum płatności</string>
+	<string name="poi_money_transfer">Przelew pieniędzy</string>
+
+<string name="poi_route_subway_ref">Metro</string>
+
+	<string name="poi_depot">Zajezdnia</string>
+
+	<string name="poi_climbing_style">Styl wspinaczki</string>
+
+<string name="poi_ref_post">Kod pocztowy</string>
+
+	<string name="poi_climbing_sport_yes">Sport: tak</string>
+	<string name="poi_climbing_sport_no">Sport: nie</string>
+	<string name="poi_climbing_boulder_yes">Wspinaczka skalna: tak</string>
+	<string name="poi_climbing_boulder_no">Wspinaczka skalna: nie</string>
+	<string name="poi_climbing_toprope_yes">Lina asekuracyjna: tak</string>
+	<string name="poi_climbing_toprope_no">Lina asekuracyjna: nie</string>
+	<string name="poi_climbing_trad_yes">Tradycyjne: tak</string>
+	<string name="poi_climbing_trad_no">Tradycyjne: nie</string>
+	<string name="poi_climbing_multipitch_yes">Wspinaczka wielowyciągowa: tak</string>
+	<string name="poi_climbing_multipitch_no">Wspinaczka wielowyciągowa: nie</string>
+	<string name="poi_climbing_ice_yes">Lód: tak</string>
+	<string name="poi_climbing_ice_no">Lód: nie</string>
+	<string name="poi_climbing_mixed_yes">Mieszane: tak</string>
+	<string name="poi_climbing_mixed_no">Mieszane: nie</string>
+	<string name="poi_climbing_deepwater_yes">Wspinaczka nad głęboką wodą (psicobloc): tak</string>
+	<string name="poi_climbing_deepwater_no">Wspinaczka nad głęboką wodą (psicobloc): nie</string>
+
+	<string name="poi_climbing_length">Długość wspinaczki</string>
+	<string name="poi_climbing_length_min">Minimalna długość wspinaczki</string>
+	<string name="poi_climbing_length_max">Maksymalna długość wspinaczki</string>
+	<string name="poi_climbing_rock_limestone">Kamień do wspinaczki: wapień</string>
+	<string name="poi_climbing_rock_granite">Kamień do wspinaczki: granit</string>
+	<string name="poi_climbing_rock_sandstone">Kamień do wspinaczki: piaskowiec</string>
+	<string name="poi_climbing_rock_quartzite">Kamień do wspinaczki: kwarcyt</string>
+	<string name="poi_climbing_rock_gneiss">Kamień do wspinaczki: gnejs</string>
+	<string name="poi_climbing_rock_porphyry">Kamień do wspinaczki: porfir</string>
+	<string name="poi_climbing_quality_solid">Jakość wspinaczki: lita</string>
+	<string name="poi_climbing_quality_fragile">Jakość wspinaczki: krucha</string>
+	<string name="poi_climbing_routes">Trasy wspinaczkowe</string>
+
+	<string name="poi_meadow_agricultural">Typ: rolniczy</string>
+	<string name="poi_meadow_transitional">Typ: przejściowy</string>
+	<string name="poi_meadow_pasture">Typ: pastwisko</string>
+
+	<string name="poi_frozen_food">Mrożonki</string>
+
+	<string name="poi_agrarian">Sklep rolniczy</string>
+
 
 </resources>

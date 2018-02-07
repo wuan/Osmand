@@ -42,7 +42,7 @@ android {
 		versionCode 300
 		versionCode System.getenv("APK_NUMBER_VERSION") ? System.getenv("APK_NUMBER_VERSION").toInteger() : versionCode
 		multiDexEnabled true
-		versionName "3.0.0"
+		versionName "2.9.0"
 		versionName System.getenv("APK_VERSION")? System.getenv("APK_VERSION").toString(): versionName
 		versionName System.getenv("APK_VERSION_SUFFIX")? versionName + System.getenv("APK_VERSION_SUFFIX").toString(): versionName
 	}
@@ -400,6 +400,7 @@ dependencies {
 	compile 'com.android.support:cardview-v7:26.1.0'
 	compile 'com.android.support:appcompat-v7:26.1.0'
 	compile 'com.android.support:design:26.1.0'
+    compile 'com.android.support:customtabs:26.1.0'
     compile 'commons-logging:commons-logging-api:1.1'
     compile 'it.unibo.alice.tuprolog:tuprolog:3.2.1'
     compile 'org.beanshell:bsh-core:2.0b4'

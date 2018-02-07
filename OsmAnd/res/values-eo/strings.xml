@@ -235,9 +235,9 @@
     <string name="welcome_header">Saluton</string>
     <string name="shared_string_and">kaj</string>
     <string name="shared_string_or">aŭ</string>
-    <string name="release_2_3">\\u2022 OSM Live. Subtenu kontribuantojn kaj programistoj, kaj havigu ĉiuhorajn mapajn ĝisdatigojn.
+    <string name="release_2_3">\\u2022 OSM Live. Subtenu kontribuantojn kaj programistoj, kaj havigu ĉiuhorajn mapajn ĝisdatigojn. 
 \n 
-\n • Mapmarkiloj. Nova maniero por rapide elekti lokojn sur la mapo. 
+\n • Map-markoj. Nova maniero por rapide elekti lokojn sur la mapo. 
 \n 
 \n • Pli multe detalaj OSM mapoj kun landspecifaj specoj de vojoj kaj multe da novaj ebloj de mapoj. 
 \n 
@@ -361,7 +361,7 @@
     <string name="shared_string_edit">Redakti</string>
     <string name="shared_string_places">Lokoj</string>
     <string name="shared_string_search">Serĉi</string>
-    <string name="shared_string_show_description">Montri priskribon.</string>
+    <string name="shared_string_show_description">Montri priskribon</string>
     <string name="welmode_download_maps">Elŝuti mapojn</string>
     <string name="shared_string_yes">Jes</string>
     <string name="shared_string_cancel">Nuligi</string>
@@ -1202,7 +1202,7 @@ Lon: %2$s</string>
     <string name="poi_filter_for_tourists">Por turistoj</string>
     <string name="poi_filter_fuel">Brulaĵo</string>
     <string name="show_warnings_title">Montri avertojn…</string>
-    <string name="show_warnings_descr">Agordi trafikajn avertojn (pri rapidlimoj, endaj haltejoj, strat-ĝiboj), avertojn pri rapid-kontroliloj kaj informojn pri koridoroj.</string>
+    <string name="show_warnings_descr">Agordi trafikajn avertojn (pri rapidlimoj, endaj haltejoj, strat-ĝiboj, tuneloj), avertojn pri rapid-kontroliloj kaj informojn pri koridoroj.</string>
     <string name="use_compass_navigation">Uzi kompason</string>
     <string name="use_compass_navigation_descr">Uzi kompason nur kiam neniu direkto estas trovita.</string>
     <string name="avoid_motorway">Eviti aŭtovojojn</string>
@@ -1373,7 +1373,7 @@ Proporcia memoro %4$s MB (limito de Android %5$s MB, Dalvik %6$s MB).</string>
     <string name="gpx_tags_txt">Etikedoj</string>
     <string name="gpx_visibility_txt">Videbleco</string>
     <string name="gpx_description_txt">Priskribo</string>
-    <string name="validate_gpx_upload_name_pwd">Bonvolu enmeti OSM-an uzantnomon kaj pasvorton por alŝuti GPX-dosierojn.</string>
+    <string name="validate_gpx_upload_name_pwd">Bonvolu enmeti OSM-uzantnomon kaj pasvorton por alŝuti GPX-dosierojn.</string>
     <string name="default_buttons_support">Subteni</string>
     <string name="support_new_features">Subteni novajn eblojn</string>
     <string name="support_new_features_descr">Donacu por vidi novajn eblaĵojn en la aplikaĵo.</string>
@@ -1455,7 +1455,7 @@ Proporcia memoro %4$s MB (limito de Android %5$s MB, Dalvik %6$s MB).</string>
     <string name="current_track">Nuna spuro</string>
     <string name="gpx_monitoring_disabled_warn">Konservu kurson uzante GPX-fenestraĵon aŭ per \'Registrado de kurso\' agordoj.</string>
     <string name="show_current_gpx_title">Montri nunan kurson</string>
-    <string name="free_version_message">Tiu ĉi senpaga versio estas limigita al %1$s elŝutoj de mapoj (inkludante ĝisdatigojn) kaj ne subtenas eksterretajn Vikipediajn artikolojn.</string>
+    <string name="free_version_message">Tiu ĉi senpaga versio estas limigita al %1$s elŝutoj de mapoj (por aldoni aŭ ĝisdatigi) kaj ne subtenas eksterretajn Vikipediajn artikolojn.</string>
     <string name="poi_context_menu_showdescription">Montri priskribon de la interesejo.</string>
     <string name="index_name_wiki">Tutmondaj Vikipediaj interesejoj</string>
     <string name="index_name_voice">Voĉ-avertoj (antaŭregistritaj, limigitaj ebloj)</string>
@@ -1944,7 +1944,7 @@ Provizore estas uzata enreta servo CloudMade.</string>
     <string name="map_view_3d">3D map-vido</string>
     <string name="map_view_3d_descr">Aktivigi tri-dimensian vidon de la mapo.</string>
     <string name="show_poi_over_map">Montri interesejojn</string>
-    <string name="show_poi_over_map_description">Montri interesejon sur la mapo (uzas la plej laste elektitan filtrilon).</string>
+    <string name="show_poi_over_map_description">Montri surtavolon de laste elektita interesejo sur la mapo.</string>
     <string name="map_tile_source">Fonto de kahelaj mapoj</string>
     <string name="map_tile_source_descr">Elekti fonton de enretaj aŭ kaŝmemorigitaj map-kaheloj.</string>
     <string name="map_source">Map-fonto</string>
@@ -2697,10 +2697,10 @@ Indikas lokon:  %1$s x %2$s"</string>
     <string name="wrong_user_name">Erara uzantnomo!</string>
     <string name="shared_string_to">Al</string>
     <string name="mapillary_menu_date_from">El</string>
-    <string name="mapillary_menu_descr_dates">Vidi bildojn aldonitajn en iu tempo.</string>
-    <string name="mapillary_menu_title_dates">Datoj</string>
+    <string name="mapillary_menu_descr_dates">Montri nur aldonitajn bildojn</string>
+    <string name="mapillary_menu_title_dates">Dato</string>
     <string name="mapillary_menu_edit_text_hint">Entajpu uzantnomon</string>
-    <string name="mapillary_menu_descr_username">Vidi bildojn aldonitajn de iu uzanto.</string>
+    <string name="mapillary_menu_descr_username">Montri nur bildojn aldonitajn de</string>
     <string name="mapillary_menu_title_username">Uzantnomo</string>
     <string name="mapillary_menu_filter_description">Vi povas filtri bildojn laŭ alŝutinto aŭ laŭ dato. Filtriloj aplikiĝas nur je pligrandigo.</string>
     <string name="shared_string_reset">Reagordi</string>
@@ -2762,7 +2762,7 @@ Indikas lokon:  %1$s x %2$s"</string>
     <string name="add_route_points">Aldoni kurspunktojn</string>
     <string name="add_line">Aldoni linion</string>
     <string name="empty_state_my_tracks">Aldoni kaj registri spurojn</string>
-    <string name="empty_state_my_tracks_desc">Registri aŭ enporti spurojn por vidigi.</string>
+    <string name="empty_state_my_tracks_desc">Registru aŭ enportu spurojn por vidigi.</string>
     <string name="empty_state_favourites">Aldoni ŝatatajn</string>
     <string name="empty_state_favourites_desc">Aldonu ŝatatajn punktojn al la mapo aŭ enportu ilin el dosiero.</string>
     <string name="import_track">Enporti spuron</string>
@@ -2799,7 +2799,7 @@ Indikas lokon:  %1$s x %2$s"</string>
     <string name="ascendingly">kreskante</string>
     <string name="date_added">Dato de aldono</string>
     <string name="order_by">Ordigi laŭ:</string>
-    <string name="show_guide_line">Montri gvidan linion</string>
+    <string name="show_guide_line">Montri gvid-liniojn</string>
     <string name="show_arrows_on_the_map">Montri sagetojn sur la mapo</string>
     <string name="show_passed">Montri malaktivajn</string>
     <string name="hide_passed">Kaŝi malaktivajn</string>
@@ -2821,14 +2821,14 @@ Indikas lokon:  %1$s x %2$s"</string>
     <string name="marker_save_as_track_descr">Elporti map-markojn al dosiero difinita tie ĉi:</string>
     <string name="marker_save_as_track">Konservi kiel kurson</string>
     <string name="move_to_history">Movi al historio</string>
-    <string name="group_will_be_removed_after_restart">Grupo estos forigita post restarto</string>
+    <string name="group_will_be_removed_after_restart">Grupo estos forigita post la sekva restarto de la aplikaĵo.</string>
     <string name="make_round_trip_descr">Aldoni kopion de komenc-punkto kiel celon.</string>
     <string name="make_round_trip">Fermita ekskurso</string>
     <string name="shared_string_navigate">Navigi</string>
     <string name="osn_modify_dialog_error">Eraro okazis: rimarko ne estis ŝanĝita</string>
     <string name="osn_modify_dialog_title">Redakti rimarkon</string>
     <string name="context_menu_item_modify_note">Redakti OSM-rimarkon</string>
-    <string name="release_2_8">• Tute refaritaj map-markoj kun helpo pri planado de vojaĝo 
+    <string name="release_2_8">• Tute refaritaj map-markoj kun gvid-linioj kaj planado de vojaĝo
 \n 
 \n• Ilo por mezuri distancoj kun ebloj proksimumigi pozicion al vojo kaj konservi punktojn kiel kurson 
 \n 
@@ -2851,17 +2851,122 @@ Indikas lokon:  %1$s x %2$s"</string>
     <string name="import_as_gpx">Enporti kiel GPX-dosieron</string>
     <string name="import_as_favorites">Enporti kiel ŝatatajn</string>
     <string name="import_file">Enporti dosieron</string>
-	<string name="tap_on_map_to_hide_interface_descr">Frapeti la mapon por baskuli butonojn kaj fenestraĵojn.</string>
+	<string name="tap_on_map_to_hide_interface_descr">Frapetu la mapon por baskuli kontrol-butonojn kaj fenestraĵojn.</string>
     <string name="tap_on_map_to_hide_interface">Plenekrana reĝimo</string>
     <string name="show_on_top_bar">Montri en supra breto</string>
-    <string name="mark_passed">Marki pasigitajn</string>
+    <string name="mark_passed">Marki kiel pasigitan</string>
     <string name="rename_marker">Alinomi markon</string>
-    <string name="digits_quantity">Nombro da ciferoj</string>
+    <string name="digits_quantity">Nombro da dekumaj pozicioj</string>
     <string name="shared_string_right">Dekstre</string>
     <string name="shared_string_left">Maldekstre</string>
     <string name="show_number_pad">Montri nombran klavaron</string>
     <string name="shared_string_paste">Englui</string>
-    <string name="coordinate_input_accuracy_description">Aŭtomate baskuli al la sekva kampo post entajpi %1$d ciferojn post la komo</string>
+    <string name="coordinate_input_accuracy_description">Aŭtomate baskuli al la sekva kampo post entajpi %1$d dekumajn ciferojn.</string>
     <string name="coordinate_input_accuracy">%1$d ciferoj</string>
     <string name="go_to_next_field">Iri al la sekva kampo</string>
+    <string name="appearance_on_the_map">Aspekto sur la mapo</string>
+    <string name="add_track_to_markers_descr">Elektu kurson por aldoni ĝiajn navigadpunktojn al map-markoj. (Nur kursoj kun navigadpunktoj vidiĝas.)</string>
+    <string name="add_favourites_group_to_markers_descr">Elektu grupon de ŝatataj por aldoni al map-markoj.</string>
+    <string name="track_waypoints">Navigadpunktoj de kurso</string>
+    <string name="favourites_group">Kategorio de ŝatataj</string>
+    <string name="add_group">Aldoni grupon</string>
+    <string name="add_group_descr">Vi povas enporti grupon el ŝatataj aŭ navigadpunktoj de kurso.</string>
+    <string name="empty_state_markers_active">Krei map-markoj!</string>
+    <string name="empty_state_markers_active_desc">Frapetu aŭ frapetadu ejojn kaj poste frapetu la butonon de flago.</string>
+    <string name="empty_state_markers_groups">Enporti grupojn</string>
+    <string name="empty_state_markers_groups_desc">Vi povas enporti grupojn de ŝatataj aŭ kurs-navigadpunktojn kiel map-markojn.</string>
+    <string name="empty_state_markers_history_desc">Markoj markitaj kiel pasigitajn montriĝos sur tiu ĉi ekrano.</string>
+    <string name="shared_string_two">Du</string>
+    <string name="shared_string_one">Unu</string>
+    <string name="show_guide_line_descr">Vidigi gvid-liniojn el via pozicio al aktivaj map-markoj.</string>
+    <string name="show_arrows_descr">Vidigi unu aŭ du sagetojn indikantajn direkton al map-markoj.</string>
+    <string name="distance_indication_descr">Elekti kiel vidigi distancon al aktivaj map-markoj.</string>
+    <string name="active_markers_descr">Elekti nombron da direkt-indikiloj por vidigi.</string>
+    <string name="looking_for_tracks_with_waypoints">Serĉado de kursoj kun navigadpunktoj</string>
+    <string name="shared_string_more_without_dots">Pli</string>
+    <string name="empty_state_osm_edits">Krei aŭ redakti OSM-objektojn</string>
+    <string name="empty_state_osm_edits_descr">Krei aŭ redakti OSM-punktojn, krei aŭ komenti OSM-rimarkojn kaj kontribui per registritaj GPX-kursoj.</string>
+    <string name="shared_string_deleted">Forigita</string>
+    <string name="shared_string_edited">Redaktita</string>
+    <string name="shared_string_added">Aldonita</string>
+    <string name="marker_activated">Aktivis markon %s.</string>
+    <string name="one_tap_active_descr">Per frapeti markon sur la mapo, movi ĝin al komenco de la listo senmalfermante kuntekstan menuon.</string>
+    <string name="one_tap_active">Aktivigi per unu frapeto</string>
+    <string name="empty_state_av_notes">Fari notojn!</string>
+    <string name="empty_state_av_notes_desc">Aldoni sonajn, videajn aŭ fotajn notojn al iu ajn punkto sur la mapo per la fenestraĵo aŭ kunteksta menuo.</string>
+    <string name="notes_by_date">Notoj laŭ dato</string>
+    <string name="by_date">Laŭ dato</string>
+    <string name="by_type">Laŭ speco</string>
+    <string name="modify_the_search_query">Modifi serĉpeton</string>
+    <string name="release_3_0">\\022 
+\n
+\n</string>
+    <string name="empty_state_markers_history">\@string/shared_string_history</string>
+    <string name="what_is_here">Tie ĉi:</string>
+    <string name="parked_at">parkumita je</string>
+    <string name="pick_up_till">Reprenu ĝis</string>
+    <string name="without_time_limit">Sen tempolimo</string>
+    <string name="context_menu_read_full_article">Legi tutan artikolon</string>
+    <string name="context_menu_read_article">Legi artikolon</string>
+    <string name="context_menu_points_of_group">Ĉiuj punktoj de la grupo</string>
+    <string name="open_from">Malfermita de</string>
+    <string name="open_till">Malfermita ĝis</string>
+    <string name="will_close_at">Estos fermita je</string>
+    <string name="will_open_at">Estos malfermita je</string>
+    <string name="will_open_on">Estos malfermita je</string>
+    <string name="additional_actions">Pliaj agoj</string>
+    <string name="av_locations_selected_desc">GPX-dosiero enhavanta koordinatojn kaj datumojn de elektitaj notoj.</string>
+    <string name="av_locations_all_desc">GPX-dosiero kun koordinatoj kaj datumoj de ĉiuj notoj.</string>
+    <string name="shared_string_actions">Agoj</string>
+    <string name="shared_string_marker">Marko</string>
+    <string name="osm_recipient_stat">%1$s redaktoj, %2$s m₿ tute</string>
+    <string name="osm_recipients_label">OSM-ricevantoj</string>
+    <string name="total_donations">Donacoj tute</string>
+<string name="shared_string_without_name">Sennoma</string>
+    <string name="lang_lo">Laŭa</string>
+    <string name="will_open_tomorrow_at">Estos malfermita morgaŭ je</string>
+    <string name="rendering_attr_hidePOILabels_name">Etikedoj de interesejoj</string>
+    <string name="release_2_9">• Ekkonado de STOP-signoj nun konsideras direkton de veturo
+\n
+\n• Nova algoritmo liveranta sencplenajn valoroj de supreniro/malsupreniro por GPX-spuroj 
+\n 
+\n• Marŝada tempo konsideras profilon de tereno (regulo de Naismith)
+\n
+\n• Plibonigita kunteksta menuo: montras kiam interesejoj (mal)fermiĝas
+\n
+\n• Transporta menuo: ĉiuj disponeblaj kursoj nun montriĝas ĉe supre
+\n
+\n• Vikipedio: aldonis butonon por malfermi la originalan artikolon, plibonigita vidigo de artikoloj
+\n
+\n• Kurso: aldonis eblon por interŝanĝi komencan punkton per fina je unu frapeto
+\n
+\n• Notoj: aldonis ordigadon laŭ tipo aŭ dato
+\n
+\n• OSM-redaktoj: montras piktogramon kaj nomon de kategorion de interesejo, montras faritajn agojn
+\n
+\n• Nova rapida ekrano por enigi koordinatojn por rapide krei map-markojn
+\n</string>
+    <string name="day_off_label">fermita</string>
+    <string name="winter_and_ski_renderer">Vintro kaj skiado</string>
+    <string name="touring_view_renderer">Turisma mapo (kontrasta kaj detala)</string>
+    <string name="nautical_renderer">Marnavigada</string>
+    <string name="copy_location_name">Kopii nomon de punkto</string>
+    <string name="toast_empty_name_error">Loko estas sennoma</string>
+<string name="show_closed_notes">Montri fermitajn rimarkojn</string>
+    <string name="switch_osm_notes_visibility_desc">Montri/kaŝi OSM-rimarkojn sur la mapo.</string>
+    <string name="gpx_file_desc">GPX - taŭga por elporti al JOSM aŭ aliaj OSM-redaktiloj.</string>
+    <string name="osc_file_desc">OSC - taŭga por elporti al OpenStreetMap.</string>
+    <string name="gpx_file">GPX-dosiero</string>
+    <string name="osc_file">OSC-dosiero</string>
+    <string name="choose_file_type">Elektu dosiertipon</string>
+    <string name="osm_edits_export_desc">Elektu kion elporti: OSM-rimarkojn, interesejojn aŭ ambaŭ.</string>
+    <string name="all_data">Ĉiuj datumoj</string>
+    <string name="osm_notes">OSM-rimarkoj</string>
+    <string name="tunnel_warning">Tunelo antaŭe</string>
+    <string name="show_tunnels">Tuneloj</string>
+<string name="shared_string_current">Nuna</string>
+    <string name="last_intermediate_dest_description">Aldoni la lastan celon al la kurso</string>
+    <string name="first_intermediate_dest_description">Aldoni la unuan celon al la kurso</string>
+    <string name="subsequent_dest_description">Movi celon supren kaj krei celon</string>
+    <string name="make_as_start_point">Igi komenc-punkton</string>
     </resources>

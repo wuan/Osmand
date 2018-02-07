@@ -380,7 +380,7 @@ public class MeasurementToolLayer extends OsmandMapLayer implements ContextMenuL
 	}
 
 	@Override
-	public void collectObjectsFromPoint(PointF point, RotatedTileBox tileBox, List<Object> o) {
+	public void collectObjectsFromPoint(PointF point, RotatedTileBox tileBox, List<Object> o, boolean unknownLocation) {
 
 	}
 
@@ -407,6 +407,11 @@ public class MeasurementToolLayer extends OsmandMapLayer implements ContextMenuL
 	@Override
 	public boolean isObjectClickable(Object o) {
 		return !isInMeasurementMode();
+	}
+
+	@Override
+	public boolean runExclusiveAction(Object o, boolean unknownLocation) {
+		return false;
 	}
 
 	interface OnSingleTapListener {

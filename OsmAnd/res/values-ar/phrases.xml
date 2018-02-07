@@ -254,7 +254,7 @@
 	<string name="poi_fuel_biogas">غاز حيوي</string>
 	<string name="poi_fuel_lh2">هيدروجين سائل</string>
 	<string name="poi_fuel_electricity">كهرباء</string>
-	<string name="poi_charging_station">محطة شحن</string>
+	<string name="poi_electricity_combined_charging">محطة شحن</string>
 	<string name="poi_compressed_air">هواء مضغوط</string>
 	<string name="poi_garages">كراجات</string>
 
@@ -497,7 +497,7 @@
 	<string name="poi_caravans">البيوت المتنقلة</string>
 	<string name="poi_power_supply">الإمداد بالطاقة</string>
 	<string name="poi_medical_system">النظام الطبي</string>
-	<string name="poi_fuel_avia_type">نوع</string>
+	<string name="poi_fuel_avia_type">نوع البنزين (avia)</string>
 	<string name="poi_additional_type">إضافي</string>
 	<string name="poi_vending_type">نوع البيع</string>
 	<string name="poi_clothes_type">نوع</string>
@@ -529,7 +529,7 @@
 	<string name="poi_dish">صحن</string>
 	<string name="poi_payment_transport_type">نوع الدفع (نقل)</string>
 	<string name="poi_social_facility_type">نوع</string>
-	<string name="poi_fuel_type">نوع</string>
+	<string name="poi_fuel_type">نوع الوقود</string>
 	<string name="poi_drive_in">سق في</string>
 	<string name="poi_drive_through">سق عبر</string>
 	<string name="poi_social_facility_for">الفئة المستهدفة</string>
@@ -734,7 +734,7 @@
 	<string name="poi_e_cigarette">متجر السجائر الإلكترونية</string>
 
 	<string name="poi_sewing">متجر البضائع الجافة</string>
-	<string name="poi_traffic_calming_choker">قلادة</string>
+	<string name="poi_traffic_calming_choker">سلسلة كبح السرعة</string>
 	<string name="poi_traffic_calming_island">مكان وقوف المارة</string>
 	<string name="poi_fuel_cng">غاز طبيعي مضغوط</string>
 	<string name="poi_fuel_svo">زيت نباتي</string>
@@ -1529,7 +1529,7 @@
 	<string name="poi_water_well">بئر</string>
 	<string name="poi_standpipe">صنبور</string>
 	<string name="poi_lock_gate">قفل البوابة</string>
-	<string name="poi_weir">حاجز مائي</string>
+	<string name="poi_weir">سدّ غاطس</string>
 	<string name="poi_breakwater">حائل الأمواج</string>
 	<string name="poi_groyne">حاجز كشف الانجراف والتعرية</string>
 
@@ -1607,4 +1607,19 @@
 	<string name="poi_surfing">ركوب الأمواج</string>
 	<string name="poi_artwork">عمل فني</string>
 	<string name="poi_battlefield">ميدان معركة</string>
-	</resources>
+	<string name="poi_water_supply_type">نوع إمدادات المياه</string>
+	<string name="poi_water_purification">تنقية المياه</string>
+	<string name="poi_survey_point">نقطة دراسة استقصائية</string>
+	<string name="poi_parking_fee">رسوم الموقف</string>
+
+	<string name="poi_map_type_street">نوع الخريطة: شارع</string>
+	<string name="poi_charging_station_filter">محطة شحن</string>
+
+	<string name="poi_post_street">شارع</string>
+	<string name="poi_post_housenumber">رقم المنزل</string>
+	<string name="poi_post_flats">شقة</string>
+
+	<string name="poi_payment_centre">مركز الدفع</string>
+	<string name="poi_money_transfer">تحويل أموال</string>
+
+</resources>

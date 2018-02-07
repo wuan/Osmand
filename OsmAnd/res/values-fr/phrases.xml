@@ -86,7 +86,7 @@
 	<string name="poi_cave_entrance">Entrée de grotte</string>
 	<string name="poi_cemetery">Cimetière</string>
 	<string name="poi_chalet">Gîte</string>
-	<string name="poi_charging_station">Station de recharge pour véhicule électrique</string>
+	<string name="poi_electricity_combined_charging">Station de recharge pour véhicule électrique</string>
 	<string name="poi_chemist">Magasin de produits d\'hygiène</string>
 	<string name="poi_city">Ville</string>
 	<string name="poi_city_wall">Remparts</string>
@@ -106,7 +106,7 @@
 	<string name="poi_communication_tower">Tour de télécommunication</string>
 	<string name="poi_compressed_air">Station de gonflage des pneumatiques</string>
 	<string name="poi_confectionery">Confiserie</string>
-	<string name="poi_construction">Voie ferrée en construction</string>
+	<string name="poi_construction">Construction</string>
 	<string name="poi_convenience">Épicerie</string>
 	<string name="poi_copyshop">Service de photocopies et d\'impression</string>
 	<string name="poi_cosmetics">Magasin de cosmétiques</string>
@@ -1453,7 +1453,7 @@
 	<string name="poi_shoes_orthopedic">Orthopédique</string>
 
 	<string name="poi_internet_access_type_wlan">Wi-Fi</string>
-	<string name="poi_internet_access_type_terminal">Terminal</string>
+	<string name="poi_internet_access_type_terminal">Borne Internet</string>
 	<string name="poi_architecture_contemporary">Architecture : contemporaine</string>
 	<string name="poi_architecture_art_nouveau">Architecture : art nouveau</string>
 	<string name="poi_architecture_neoclassicism">Architecture : néo-classique</string>
@@ -1626,7 +1626,7 @@
 
 	<string name="poi_theatre_genre_opera">Opéra</string>
 	<string name="poi_theatre_genre_philharmonic">Philharmonique</string>
-	<string name="poi_theatre_genre_musical">Musical</string>
+	<string name="poi_theatre_genre_musical">Comédie musicale</string>
 	<string name="poi_theatre_genre_drama">Dramatique</string>
 	<string name="poi_theatre_genre_cabaret">Cabaret</string>
 	<string name="poi_theatre_genre_puppet">Marionnette</string>
@@ -2152,8 +2152,8 @@
 	<string name="poi_self_service">Libre service</string>
 	<string name="poi_automated">Automatisé</string>
 	<string name="poi_parking_type">Type</string>
-	<string name="poi_fuel_type">Type</string>
-	<string name="poi_fuel_avia_type">Type</string>
+	<string name="poi_fuel_type">Type de carburant</string>
+	<string name="poi_fuel_avia_type">Type de carburant (avions)</string>
 	<string name="poi_payment_type">Type de paiement</string>
 	<string name="poi_traffic_signals_sound">Son</string>
 	<string name="poi_tactile_paving">Bande podotactile</string>
@@ -2267,7 +2267,7 @@
 	<string name="poi_payment_electronic_purses_no">Porte-monnaie électroniques non acceptés</string>
 	<string name="poi_payment_visa_debit_no">Cartes de débit Visa non acceptées</string>
 	<string name="poi_payment_dogecoin_no">Dogecoin non acceptés</string>
-	<string name="poi_brewery_additional">Nom de la brasserie</string>
+	<string name="poi_brewery_additional">Nom de brasserie</string>
 	<string name="poi_vending_excrement_bags">Sacs pour récupérer les déjections canines</string>
 	<string name="poi_brushless">Sans balais</string>
 	<string name="poi_vending_fuel">Station essence</string>
@@ -2331,7 +2331,7 @@
 	<string name="poi_aerialway_bicycle">Transport de vélos</string>
 	<string name="poi_aerialway_heating">Chauffage</string>
 	<string name="poi_pharmacy_dispensing">Ordonnance</string>
-	<string name="poi_star_rating">Évaluation</string>
+	<string name="poi_star_rating">Évaluation (étoiles)</string>
 	<string name="poi_power_supply">Prise de courant</string>
 	<string name="poi_retail">Zone commerciale</string>
 
@@ -2734,7 +2734,7 @@
 	<string name="poi_free_flying_rigid_yes">Rigide</string>
 	<string name="poi_medical_system_kampo_yes">Kampo</string>
 	<string name="poi_medical_system_ayurveeda_yes">Ayurveda</string>
-	<string name="poi_medical_system_unani_yes">Unani</string>
+	<string name="poi_medical_system_unani_yes">Yunâni</string>
 
 	<string name="poi_button_operated_yes">Actionné par un bouton : oui</string>
 	<string name="poi_button_operated_no">Actionné par un bouton : non</string>
@@ -2790,7 +2790,7 @@
 	<string name="poi_cuisine_tea_shop">Salon de thé</string>
 	<string name="poi_cuisine_soup">Soupe</string>
 	<string name="poi_cuisine_pie">Tarte</string>
-	<string name="poi_cuisine_hotdog">Hotdog</string>
+	<string name="poi_cuisine_hotdog">Hot-dog</string>
 	<string name="poi_cuisine_salad">Salade</string>
 	<string name="poi_cuisine_frozen_yogurt">Yaourt glacé</string>
 	<string name="poi_cuisine_fried_food">Friture</string>
@@ -2822,7 +2822,7 @@
 	<string name="poi_cuisine_wine">Vin</string>
 	<string name="poi_cuisine_potato">Pomme de terre</string>
 	<string name="poi_cuisine_brunch">Brunch</string>
-	<string name="poi_cuisine_pita">Pita</string>
+	<string name="poi_cuisine_pita">Pain pita</string>
 	<string name="poi_cuisine_fondue">Fondue</string>
 	<string name="poi_cuisine_baguette">Baguette</string>
 	<string name="poi_cuisine_burrito">Burrito</string>
@@ -2884,7 +2884,7 @@
 	<string name="poi_cuisine_mongolian">Mongol</string>
 	<string name="poi_cuisine_middle_eastern">Moyen-oriental</string>
 	<string name="poi_cuisine_ukrainian">Ukrainien</string>
-	<string name="poi_cuisine_afghan">Afghan</string>
+	<string name="poi_cuisine_afghan">Cuisine afghane</string>
 	<string name="poi_cuisine_belgian">Belge</string>
 	<string name="poi_cuisine_basque">Basque</string>
 	<string name="poi_cuisine_swiss">Suisse</string>
@@ -2896,11 +2896,11 @@
 	<string name="poi_cuisine_english">Anglais</string>
 	<string name="poi_cuisine_pakistani">Pakistanais</string>
 	<string name="poi_cuisine_taiwanese">Taïwanais</string>
-	<string name="poi_cuisine_tex_mex">Tex-mex</string>
+	<string name="poi_cuisine_tex_mex">Cuisine tex-mex</string>
 	<string name="poi_cuisine_dutch">Néerlandais</string>
 	<string name="poi_cuisine_syrian">Syrien</string>
 	<string name="poi_cuisine_australian">Australien</string>
-	<string name="poi_cuisine_cajun">Cajun</string>
+	<string name="poi_cuisine_cajun">Cuisine cadienne</string>
 	<string name="poi_cuisine_egyptian">Égyptien</string>
 	<string name="poi_cuisine_senegalese">Sénégalais</string>
 	<string name="poi_cuisine_jewish">Juif</string>
@@ -2915,7 +2915,7 @@
 
 	<string name="poi_tower_construction_dish">Construction : antenne parabolique</string>
 	<string name="poi_cuisine_pastel">Pastel</string>
-	<string name="poi_cuisine_sub">Sub</string>
+	<string name="poi_cuisine_sub">Sandwich sous-marin</string>
 	<string name="poi_xmas_note">Noël : note</string>
 	<string name="poi_xmas_opening_hours">Noël : horaires d\'ouverture</string>
 	<string name="poi_xmas_location">Noël : emplacement</string>
@@ -3013,7 +3013,7 @@
 	<string name="poi_animal_shelter_mammal">Mammifères</string>
 	<string name="poi_animal_shelter_fish">Poissons</string>
 
-	<string name="poi_information_trail_blaze">Balise de voie</string>
+	<string name="poi_information_trail_blaze">Balise de chemin</string>
 	<string name="poi_traffic_signals_sound_walk">Autorisé uniquement à pied</string>
 
 	<string name="poi_piste_grooming_backcountry">Arrière-pays</string>
@@ -3030,13 +3030,13 @@
 	<string name="poi_architecture_wilhelminian_style">Architecture : Style wilhelminien</string>
 	<string name="poi_tunnel_waterway">Tunnel d\'eau</string>
 	<string name="poi_bridge_waterway">Pont de voie navigable</string>
-	<string name="poi_payment_ep_minicash_yes">MiniCash</string>
+	<string name="poi_payment_ep_minicash_yes">Minicash</string>
 	<string name="poi_payment_ep_monedero4b_yes">Monedero 4B</string>
 	<string name="poi_payment_ep_monedero_yes">Monedero</string>
 	<string name="poi_brushless_no">Sans balai</string>
 	<string name="poi_boat_rental_type">Location bateaux</string>
 
-<string name="poi_toilets_access_community">Accès toilettes : communauté</string>
+<string name="poi_toilets_access_community">Accès aux toilettes : propriété collective</string>
 	<string name="poi_vending_toll">Péage par automate</string>
 	<string name="poi_memorial_fassade_decoration">Décoration de façade</string>
 
@@ -3085,7 +3085,7 @@
 	<string name="poi_historic_period_classical">Période historique: classique (époque IV, 374 ap. JC - 900 ap. JC)</string>
 	<string name="poi_historic_period_imperial">Période historique: impériale (époque V, 900 ap. JC - 1200 ap. JC)</string>
 
-	<string name="poi_stone_type_conciliation_cross">Type: croix de conciliation</string>
+	<string name="poi_stone_type_conciliation_cross">Type : croix de conciliation</string>
 	<string name="poi_site_type_earthwork">Terrassement</string>
 	<string name="poi_nuclear_explosion_date_utc">Date de l\'explosion (UTC)</string>
 	<string name="poi_nuclear_explosion_time_utc">Heure de l\'explosion (UTC)</string>
@@ -3104,5 +3104,107 @@
 	<string name="poi_truck_no">Camion : non</string>
 
 	<string name="poi_parking_fee">Tarif de stationnement</string>
+
+	<string name="poi_water_purification">Assainissement de l\'eau</string>
+	<string name="poi_water_place_access">Point d\'eau</string>
+
+<string name="poi_seamark_clearance_height">Hauteur maximale</string>
+	<string name="poi_seamark_clearance_height_closed">Hauteur maximale (fermé)</string>
+	<string name="poi_seamark_clearance_height_open">Hauteur maximale (ouvert)</string>
+	<string name="poi_seamark_clearance_width">Largeur maximale</string>
+
+	<string name="poi_health_specialty_general_yes">Médecin généraliste</string>
+	<string name="poi_health_specialty_palliative_medicine_yes">Médecine palliative</string>
+
+	<string name="poi_stone_type_coat_of_arms">Type : blason</string>
+
+	<string name="poi_reservation_yes">Réservation : oui</string>
+	<string name="poi_reservation_no">Réservation : non</string>
+	<string name="poi_reservation_members_only">Réservation : membres uniquement</string>
+
+	<string name="poi_operational_status">État opérationnel</string>
+	<string name="poi_water_supply_type">Mode de distribution de l\'eau</string>
+	<string name="poi_amperage">Ampérage</string>
+	<string name="poi_letter_box">Boite aux lettres</string>
+	<string name="poi_post_street">Rue</string>
+	<string name="poi_post_flats">Plat</string>
+
+	<string name="poi_payment_centre">Centre de paiement</string>
+	<string name="poi_health_facility_type_office">Bureau médical</string>
+	<string name="poi_parking_fee_yes">Stationnement payant : oui</string>
+	<string name="poi_parking_fee_no">Stationnement payant : non</string>
+	<string name="poi_zoo_birds">Oiseaux</string>
+	<string name="poi_motorcycle_rental_yes">Location</string>
+	<string name="poi_motorcycle_rental_no">Location : non</string>
+	<string name="poi_motorcycle_repair_yes">Réparation</string>
+	<string name="poi_motorcycle_repair_no">Réparation : non</string>
+	<string name="poi_motorcycle_parts_yes">Pièces détachées</string>
+	<string name="poi_motorcycle_parts_no">Pièces détachées : non</string>
+	<string name="poi_motorcycle_tyres_yes">Pneus</string>
+	<string name="poi_motorcycle_tyres_no">Pneus : non</string>
+	<string name="poi_owner">Propriétaire</string>
+
+	<string name="poi_direction_clockwise">Direction : sens horaire</string>
+	<string name="poi_direction_anticlockwise">Direction : sens anti-horaire</string>
+	<string name="poi_direction_entrance">Direction : entrée</string>
+	<string name="poi_direction_exit">Direction : sortie</string>
+	<string name="poi_boat_rental">Location de bateau</string>
+	<string name="poi_boat_sailboat_rental_yes">Bateaux à voile : oui</string>
+	<string name="poi_boat_sailboat_rental_no">Bateaux à voile : non</string>
+	<string name="poi_network">Réseau</string>
+
+	<string name="poi_government_archive">Archive</string>
+	<string name="poi_government_public_service">Service public</string>
+	<string name="poi_vhf">Canal VHF</string>
+
+	<string name="poi_mountain_area">Zone montagneuse</string>
+
+	<string name="poi_operational_status_broken">Cassé</string>
+	<string name="poi_operational_status_needs_maintenance">A réparer</string>
+
+	<string name="poi_water_purification_none">Aucune</string>
+	<string name="poi_water_purification_reverse_osmosis">Osmose inverse</string>
+	<string name="poi_water_supply_pump">Pompe</string>
+	<string name="poi_site_type_settlement">Implantation</string>
+	<string name="poi_fortification_type_sconce">Type de fortification : rempart</string>
+	<string name="poi_bridge_ref">Référence du pont</string>
+	<string name="poi_tunnel_ref">Référence du tunnel</string>
+
+	<string name="poi_health_specialty_paediatrics_no">Spécialité médicale : pédiatrie : non</string>
+	<string name="poi_health_specialty_emergency_medicine_no">Spécialité médicale : médecine d\'urgence : non</string>
+	<string name="poi_health_specialty_tropical_medicine_no">Spécialité médicale : médecine tropicale : non</string>
+	<string name="poi_health_specialty_obstetrics_postnatal_no">Spécialité médicale : obstétrique (postnatale) : non</string>
+	<string name="poi_health_specialty_obstetrics_antenatal_no">Spécialité médicale : obstétrique (prénatale) : non</string>
+	<string name="poi_health_specialty_social_paediatrics_no">Spécialité médicale : pédiatrie sociale : non</string>
+	<string name="poi_health_specialty_obstetrics_caesarean_section_no">Spécialité médicale : obstétrique (césarienne) : non</string>
+	<string name="poi_health_specialty_addiction_medicine_yes">Addictologie</string>
+	<string name="poi_health_specialty_speech_therapy_yes">Orthophonie</string>
+	<string name="poi_health_specialty_manual_therapy_yes">Thérapie manuelle</string>
+	<string name="poi_route_subway_ref">Métro</string>
+
+	<string name="poi_climbing_orientation_n">Orientation du mur : N</string>
+	<string name="poi_climbing_orientation_ne">Orientation du mur : NE</string>
+	<string name="poi_climbing_orientation_e">Orientation du mur : E</string>
+	<string name="poi_climbing_orientation_se">Orientation du mur : SE</string>
+	<string name="poi_climbing_orientation_s">Orientation du mur : S</string>
+	<string name="poi_climbing_orientation_sw">Orientation du mur : SO</string>
+	<string name="poi_climbing_orientation_w">Orientation du mur : O</string>
+	<string name="poi_climbing_orientation_nw">Orientation du mur : NO</string>
+	<string name="poi_climbing_routes">Voies d\'escalade</string>
+
+
+<string name="poi_fire_hydrant_position_sidewalk">Trottoir</string>
+	<string name="poi_fire_hydrant_position_green">Herbe</string>
+	<string name="poi_fire_hydrant_position_lane">Chaussée</string>
+	<string name="poi_fire_hydrant_position_parking_lot">Parking</string>
+	<string name="poi_fire_hydrant_position_street">Rue</string>
+	<string name="poi_fire_hydrant_position_underground">Souterrain</string>
+	<string name="poi_street_cabinet_telecom">Type d\'armoire : télécom</string>
+	<string name="poi_street_cabinet_cable_tv">Type d\'armoire : tv câblée</string>
+	<string name="poi_street_cabinet_gas">Type d\'armoire : gaz</string>
+	<string name="poi_street_cabinet_postal_service">Type d\'armoire : service postal</string>
+	<string name="poi_street_cabinet_waste">Type d\'armoire : déchets</string>
+	<string name="poi_street_cabinet_water_management">Type d\'armoire : gestion de l\'eau</string>
+	<string name="poi_street_cabinet_street_lighting">Type d\'armoire : éclairage public</string>
 
 	</resources>

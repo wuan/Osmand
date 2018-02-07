@@ -21,7 +21,7 @@ import net.osmand.plus.OsmandSettings.OsmandPreference;
 import net.osmand.plus.R;
 import net.osmand.plus.activities.MapActivity;
 import net.osmand.plus.dialogs.ConfigureMapMenu;
-import net.osmand.plus.mapmarkers.ShowDirectionBottomSheetDialogFragment;
+import net.osmand.plus.mapmarkers.DirectionIndicationDialogFragment;
 import net.osmand.plus.quickaction.QuickActionListFragment;
 import net.osmand.plus.views.MapInfoLayer;
 import net.osmand.plus.views.MapQuickActionLayer;
@@ -326,10 +326,9 @@ public class MapWidgetRegistry {
 					.setDescription(settings.MAP_MARKERS_MODE.get().toHumanString(map))
 					.setListener(new ContextMenuAdapter.ItemClickListener() {
 						@Override
-						public boolean onContextMenuClick(final ArrayAdapter<ContextMenuItem> adapter, int itemId, final int position, boolean isChecked) {
-							ShowDirectionBottomSheetDialogFragment fragment = new ShowDirectionBottomSheetDialogFragment();
-							fragment.setUsedOnMap(true);
-							fragment.setListener(new ShowDirectionBottomSheetDialogFragment.ShowDirectionFragmentListener() {
+						public boolean onContextMenuClick(final ArrayAdapter<ContextMenuItem> adapter, int itemId, final int position, boolean isChecked, int[] viewCoordinates) {
+							DirectionIndicationDialogFragment fragment = new DirectionIndicationDialogFragment();
+							fragment.setListener(new DirectionIndicationDialogFragment.DirectionIndicationFragmentListener() {
 								@Override
 								public void onMapMarkersModeChanged(boolean showDirectionEnabled) {
 									updateMapMarkersMode(map);
@@ -337,7 +336,7 @@ public class MapWidgetRegistry {
 									adapter.notifyDataSetChanged();
 								}
 							});
-							fragment.show(map.getSupportFragmentManager(), ShowDirectionBottomSheetDialogFragment.TAG);
+							fragment.show(map.getSupportFragmentManager(), DirectionIndicationDialogFragment.TAG);
 							return false;
 						}
 					}).setLayout(R.layout.list_item_text_button).createItem());
@@ -346,8 +345,13 @@ public class MapWidgetRegistry {
 
 	public void updateMapMarkersMode(MapActivity mapActivity) {
 		for (MapWidgetRegInfo info : rightWidgetSet) {
-			if ("map_marker_1st".equals(info.key) || "map_marker_2nd".equals(info.key)) {
-				setVisibility(info, settings.MAP_MARKERS_MODE.get().isWidgets(), false);
+			if ("map_marker_1st".equals(info.key)) {
+				setVisibility(info, settings.MAP_MARKERS_MODE.get().isWidgets()
+						&& settings.MARKERS_DISTANCE_INDICATION_ENABLED.get(), false);
+			} else if ("map_marker_2nd".equals(info.key)) {
+				setVisibility(info, settings.MAP_MARKERS_MODE.get().isWidgets()
+						&& settings.MARKERS_DISTANCE_INDICATION_ENABLED.get()
+						&& settings.DISPLAYED_MARKERS_WIDGETS_COUNT.get() == 2, false);
 			}
 		}
 		MapInfoLayer mil = mapActivity.getMapLayers().getMapInfoLayer();
@@ -414,7 +418,7 @@ public class MapWidgetRegistry {
 				.setSecondaryIcon( R.drawable.ic_action_additional_option)
 				.setListener(new ContextMenuAdapter.OnRowItemClick() {
 					@Override
-					public boolean onContextMenuClick(ArrayAdapter<ContextMenuItem> adapter, int itemId, int position, boolean isChecked) {
+					public boolean onContextMenuClick(ArrayAdapter<ContextMenuItem> adapter, int itemId, int position, boolean isChecked, int[] viewCoordinates) {
 						setVisibility(adapter, position, isChecked);
 						return false;
 					}
@@ -553,7 +557,7 @@ public class MapWidgetRegistry {
 
 						@Override
 						public boolean onContextMenuClick(ArrayAdapter<ContextMenuItem> a,
-														  int itemId, int pos, boolean isChecked) {
+														  int itemId, int pos, boolean isChecked, int[] viewCoordinates) {
 							setVisibility(a, pos, isChecked, false);
 							return false;
 						}
@@ -776,7 +780,7 @@ public class MapWidgetRegistry {
 
 		@Override
 		public boolean onContextMenuClick(ArrayAdapter<ContextMenuItem> a,
-										  int itemId, int pos, boolean isChecked) {
+										  int itemId, int pos, boolean isChecked, int[] viewCoordinates) {
 			pref.set(!pref.get());
 			map.updateApplicationModeSettings();
 			a.notifyDataSetChanged();

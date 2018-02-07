@@ -205,7 +205,7 @@
 	<string name="poi_fuel_e85">85% Етанолу (Е85)</string>
 	<string name="poi_fuel_lh2">Рідкий водень</string>
 	<string name="poi_fuel_electricity">Електроенергія</string>
-	<string name="poi_charging_station">Станція зарядки</string>
+	<string name="poi_electricity_combined_charging">Станція зарядки</string>
 	<string name="poi_vehicle_ramp">Рампа для огляду/перевірки машин</string>
 	<string name="poi_compressed_air">Стиснене повітря</string>
 	<string name="poi_parking">Стоянка</string>
@@ -547,7 +547,7 @@
 	<string name="poi_cuisine_fast_food">Швидке харчування</string>
 	<string name="poi_cuisine_bakery">Пекарня</string>
 	<string name="poi_fuel_type">Вид палива</string>
-	<string name="poi_fuel_avia_type">Вид палива</string>
+	<string name="poi_fuel_avia_type">Тип авіаційного палива</string>
 	<string name="poi_payment_type">Тип оплати</string>
 	<string name="poi_payment_fuel_type">Паливні картки</string>
 	<string name="poi_internet_access_type">Тип доступу в Інтернет</string>
@@ -3640,4 +3640,32 @@
 	<string name="poi_map_size_city">Охоплення мапи: місто</string>
 	<string name="poi_map_size_region">Охоплення мапи: регіон</string>
 
-</resources>
+<string name="poi_charging_station_filter">Зарядна станція</string>
+
+<string name="poi_depot">Депо</string>
+
+<string name="poi_letter_box">Поштова скринька</string>
+	<string name="poi_post_street">Вулиця</string>
+	<string name="poi_post_housenumber">Номер будинку</string>
+	<string name="poi_post_flats">Квартира</string>
+
+	<string name="poi_payment_centre">Платіжний центр</string>
+	<string name="poi_money_transfer">Грошові перекази</string>
+
+<string name="poi_route_subway_ref">Метро</string>
+
+	<string name="poi_ref_post">Поштовий індекс</string>
+
+	<string name="poi_climbing_sport_yes">Спортивний: так</string>
+	<string name="poi_climbing_sport_no">Спортивний: ні</string>
+	<string name="poi_climbing_trad_yes">Традиційний: так</string>
+	<string name="poi_climbing_trad_no">Традиційний: ні</string>
+	<string name="poi_climbing_ice_yes">Льодяний: так</string>
+	<string name="poi_climbing_ice_no">Льодяний: ні</string>
+	<string name="poi_climbing_mixed_yes">Змішаний: так</string>
+	<string name="poi_climbing_mixed_no">Змішаний: ні</string>
+	<string name="poi_climbing_rock_limestone">Тип каменю: вапняк</string>
+	<string name="poi_climbing_rock_granite">Тип каменю: граніт</string>
+	<string name="poi_climbing_rock_sandstone">Тип каменю: піщаник</string>
+	<string name="poi_climbing_rock_quartzite">Тип каменю: кварцит</string>
+	</resources>

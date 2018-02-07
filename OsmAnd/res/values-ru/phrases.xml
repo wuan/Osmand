@@ -155,7 +155,7 @@
 	<string name="poi_vehicle_inspection">Пункт техосмотра</string>
 	<string name="poi_car_wash">Автомойка</string>
 	<string name="poi_fuel">Автомобильная заправка</string>
-	<string name="poi_charging_station">Зарядная станция</string>
+	<string name="poi_electricity_combined_charging">Зарядная станция</string>
 	<string name="poi_vehicle_ramp">Ремонтная эстакада/яма</string>
 	<string name="poi_compressed_air">Подкачка шин</string>
 	<string name="poi_parking">Парковка</string>
@@ -3644,4 +3644,94 @@
 
 	<string name="poi_charging_station_filter">Зарядная станция</string>
 
-</resources>
+<string name="poi_additional_type">Дополнительный</string>
+	<string name="poi_highway_crossing_type">Тип</string>
+	<string name="poi_free_flying_characteristics">Характеристика</string>
+	<string name="poi_denomination_uniting">Объединяющая Церковь в Австралии</string>
+	<string name="poi_denomination_reform">Реформистский иудаизм</string>
+	<string name="poi_seamark_dyke">Водяной знак: насыпь</string>
+	<string name="poi_radar_transponder">Радиолокационный транспондер (навигационный знак)</string>
+	<string name="poi_topmark">Топовая фигура (навигационный знак)</string>
+	<string name="poi_seamark_clearance_height">Габаритная высота</string>
+	<string name="poi_seamark_clearance_width">Габаритная ширина</string>
+
+	<string name="poi_youtube">YouTube</string>
+	<string name="poi_instagram">Instagram</string>
+	<string name="poi_google_plus">Google+</string>
+	<string name="poi_content_wastewater">Содержимое: стоки</string>
+	<string name="poi_enforcement_check">Требование: контроль</string>
+	<string name="poi_payment_account_cards_no">Карточки не принимаются</string>
+	<string name="poi_payment_prepaid_ticket_yes">Предоплаченные билеты</string>
+
+	<string name="poi_depot">Депо</string>
+
+	<string name="poi_letter_box">Абонентский почтовый ящик</string>
+	<string name="poi_post_street">Улица</string>
+	<string name="poi_post_housenumber">Номер дома</string>
+	<string name="poi_post_flats">Квартира</string>
+
+	<string name="poi_payment_centre">Платёжный центр</string>
+	<string name="poi_money_transfer">Денежные переводы</string>
+
+	<string name="poi_ref_post">Почтовый код</string>
+
+	<string name="poi_climbing_style">Стиль скалолазания</string>
+	<string name="poi_climbing_sport_yes">Спортивный: да</string>
+	<string name="poi_climbing_sport_no">Спортивный: нет</string>
+	<string name="poi_climbing_boulder_yes">Боулдеринг: да</string>
+	<string name="poi_climbing_boulder_no">Боулдеринг: нет</string>
+	<string name="poi_climbing_trad_yes">Традиционный: да</string>
+	<string name="poi_climbing_trad_no">Традиционный: нет</string>
+	<string name="poi_climbing_ice_yes">Ледяной: да</string>
+	<string name="poi_climbing_ice_no">Ледяной: нет</string>
+	<string name="poi_climbing_mixed_yes">Смешанный: да</string>
+	<string name="poi_climbing_mixed_no">Смешанный: нет</string>
+	<string name="poi_climbing_deepwater_yes">Лазание над водой: да</string>
+	<string name="poi_climbing_deepwater_no">Лазание над водой: нет</string>
+
+	<string name="poi_climbing_length">Высота подъёма</string>
+	<string name="poi_climbing_length_min">Высота подъёма (мин)</string>
+	<string name="poi_climbing_length_max">Высота подъёма (макс)</string>
+	<string name="poi_climbing_rock_limestone">Тип камня: известняк</string>
+	<string name="poi_climbing_rock_granite">Тип камня: гранит</string>
+	<string name="poi_climbing_rock_sandstone">Тип камня: песчаник</string>
+	<string name="poi_climbing_rock_quartzite">Тип камня: кварцит</string>
+	<string name="poi_climbing_rock_gneiss">Тип камня: гнейс</string>
+	<string name="poi_climbing_rock_porphyry">Тип камня: порфир</string>
+	<string name="poi_climbing_quality_solid">Надежность камней: прочно</string>
+	<string name="poi_climbing_quality_fragile">Надежность камней: ненадёжно</string>
+	<string name="poi_climbing_bolted_yes">Фиксированные зацепы: есть</string>
+	<string name="poi_climbing_bolted_no">Фиксированные зацепы: нет</string>
+	<string name="poi_climbing_orientation_n">Ориентация стены: С</string>
+	<string name="poi_climbing_orientation_ne">Ориентация стены: СВ</string>
+	<string name="poi_climbing_orientation_e">Ориентация стены: В</string>
+	<string name="poi_climbing_orientation_se">Ориентация стены: ЮГ</string>
+	<string name="poi_climbing_orientation_s">Ориентация стены: Ю</string>
+	<string name="poi_climbing_orientation_sw">Ориентация стены: ЮЗ</string>
+	<string name="poi_climbing_orientation_w">Ориентация стены: З</string>
+	<string name="poi_climbing_orientation_nw">Ориентация стены: СЗ</string>
+	<string name="poi_climbing_summit_log_yes">Журнал восхождений: есть</string>
+	<string name="poi_climbing_summit_log_no">Журнал восхождений: нет</string>
+	<string name="poi_climbing_routes">Скальные маршруты</string>
+
+	<string name="poi_circumference">Обхват ствола</string>
+	<string name="poi_diameter_crown">Диаметр кроны</string>
+
+	<string name="poi_meadow_agricultural">Тип: сельскохозяйственный</string>
+	<string name="poi_meadow_perpetual">Тип: природный</string>
+	<string name="poi_meadow_transitional">Тип: зарастающий</string>
+	<string name="poi_meadow_pasture">Тип: пастбище</string>
+
+	<string name="poi_frozen_food">Замороженные продукты</string>
+
+	<string name="poi_agrarian">Сельскохозяйственный магазин</string>
+
+	<string name="poi_shop_fireplace">Магазин каминов</string>
+
+	<string name="poi_mountain_area">Горный массив</string>
+	<string name="poi_couloir">Ущелье</string>
+	<string name="poi_gorge">Теснина</string>
+
+	<string name="poi_shop_boat">Магазин лодок</string>
+
+	</resources>

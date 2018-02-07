@@ -19,11 +19,15 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import net.osmand.Location;
+import net.osmand.data.Amenity;
+import net.osmand.data.FavouritePoint;
 import net.osmand.data.LatLon;
-import net.osmand.plus.MapMarkersHelper;
+import net.osmand.data.PointDescription;
+import net.osmand.plus.GPXUtilities.WptPt;
 import net.osmand.plus.MapMarkersHelper.MapMarker;
 import net.osmand.plus.OsmAndLocationProvider.OsmAndCompassListener;
 import net.osmand.plus.OsmAndLocationProvider.OsmAndLocationListener;
@@ -32,8 +36,10 @@ import net.osmand.plus.R;
 import net.osmand.plus.activities.MapActivity;
 import net.osmand.plus.base.MapViewTrackingUtilities;
 import net.osmand.plus.dashboard.DashLocationFragment;
+import net.osmand.plus.mapmarkers.SelectionMarkersGroupBottomSheetDialogFragment.AddMarkersGroupFragmentListener;
 import net.osmand.plus.mapmarkers.adapters.MapMarkerItemViewHolder;
 import net.osmand.plus.mapmarkers.adapters.MapMarkersGroupsAdapter;
+import net.osmand.plus.widgets.EmptyStateRecyclerView;
 import net.osmand.util.MapUtils;
 
 public class MapMarkersGroupsFragment extends Fragment implements OsmAndCompassListener, OsmAndLocationListener {
@@ -49,15 +55,30 @@ public class MapMarkersGroupsFragment extends Fragment implements OsmAndCompassL
 	private Paint textPaint = new Paint();
 	private Snackbar snackbar;
 	private boolean compassUpdateAllowed = true;
+	private View mainView;
+	private String groupIdToOpen;
 
 	@Nullable
 	@Override
 	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		final MapActivity mapActivity = (MapActivity) getActivity();
 		final boolean night = !mapActivity.getMyApplication().getSettings().isLightContent();
-		final RecyclerView recyclerView = new RecyclerView(getContext());
-		recyclerView.setPadding(0, 0, 0, (int) mapActivity.getResources().getDimension(R.dimen.map_markers_recycler_view_padding_bottom));
-		recyclerView.setClipToPadding(false);
+		mainView = inflater.inflate(R.layout.fragment_map_markers_groups, container, false);
+
+		Fragment selectionMarkersGroupFragment = getChildFragmentManager().findFragmentByTag(SelectionMarkersGroupBottomSheetDialogFragment.TAG);
+		if (selectionMarkersGroupFragment != null) {
+			((SelectionMarkersGroupBottomSheetDialogFragment) selectionMarkersGroupFragment).setListener(createAddMarkersGroupFragmentListener());
+		}
+		Fragment addGroupFragment = getChildFragmentManager().findFragmentByTag(AddGroupBottomSheetDialogFragment.TAG);
+		if (addGroupFragment != null) {
+			((AddGroupBottomSheetDialogFragment) addGroupFragment).setListener(createAddGroupListener());
+		}
+		Fragment historyMarkerMenuFragment = getChildFragmentManager().findFragmentByTag(HistoryMarkerMenuBottomSheetDialogFragment.TAG);
+		if (historyMarkerMenuFragment != null) {
+			((HistoryMarkerMenuBottomSheetDialogFragment) historyMarkerMenuFragment).setListener(createHistoryMarkerMenuListener());
+		}
+
+		final EmptyStateRecyclerView recyclerView = (EmptyStateRecyclerView) mainView.findViewById(R.id.list);
 		recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 		recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 			@Override
@@ -171,10 +192,6 @@ public class MapMarkersGroupsFragment extends Fragment implements OsmAndCompassL
 					int snackbarStringRes;
 					if (direction == ItemTouchHelper.RIGHT) {
 						mapActivity.getMyApplication().getMapMarkersHelper().moveMapMarkerToHistory((MapMarker) item);
-						MapMarkersHelper.MapMarkersGroup group = mapActivity.getMyApplication().getMapMarkersHelper().getMapMarkerGroupByName(marker.groupName);
-						if (group != null) {
-							mapActivity.getMyApplication().getMapMarkersHelper().updateGroup(group);
-						}
 						snackbarStringRes = R.string.marker_moved_to_history;
 					} else {
 						mapActivity.getMyApplication().getMapMarkersHelper().removeMarker((MapMarker) item);
@@ -214,16 +231,177 @@ public class MapMarkersGroupsFragment extends Fragment implements OsmAndCompassL
 				Object item = adapter.getItem(pos);
 				if (item instanceof MapMarker) {
 					MapMarker marker = (MapMarker) item;
-					mapActivity.getMyApplication().getSettings()
-							.setMapLocationToShow(marker.getLatitude(), marker.getLongitude(), 15, null, false, null);
-					MapActivity.launchMapActivityMoveToTop(mapActivity);
-					MarkerMenuOnMapFragment.showInstance(mapActivity, marker);
-					((DialogFragment) getParentFragment()).dismiss();
+					OsmandApplication app = mapActivity.getMyApplication();
+					if (!marker.history) {
+						if (app.getSettings().SELECT_MARKER_ON_SINGLE_TAP.get()) {
+							app.getMapMarkersHelper().moveMarkerToTop(marker);
+							updateAdapter();
+						} else {
+							FavouritePoint fav = marker.favouritePoint == null
+									? app.getFavorites().getVisibleFavByLatLon(marker.point)
+									: marker.favouritePoint;
+							if (fav != null) {
+								showMap(marker.point, fav.getPointDescription(), fav);
+								return;
+							}
+
+							WptPt pt = marker.wptPt == null
+									? app.getSelectedGpxHelper().getVisibleWayPointByLatLon(marker.point)
+									: marker.wptPt;
+							if (pt != null) {
+								showMap(marker.point, pt.getPointDescription(mapActivity), pt);
+								return;
+							}
+
+							Amenity mapObj = mapActivity.getMapLayers().getMapMarkersLayer().getMapObjectByMarker(marker);
+							PointDescription desc = mapObj == null
+									? marker.getPointDescription(mapActivity)
+									: mapActivity.getMapLayers().getPoiMapLayer().getObjectName(mapObj);
+							showMap(marker.point, desc, mapObj == null ? marker : mapObj);
+						}
+					} else {
+						showHistoryMenuFragment(pos, marker);
+					}
 				}
 			}
+
+			private void showMap(LatLon latLon, PointDescription desc, Object objToShow) {
+				mapActivity.getMyApplication().getSettings().setMapLocationToShow(latLon.getLatitude(),
+						latLon.getLongitude(), 15, desc, true, objToShow);
+				MapActivity.launchMapActivityMoveToTop(mapActivity);
+				((DialogFragment) getParentFragment()).dismiss();
+			}
+
+			private void showHistoryMenuFragment(int pos, MapMarker marker) {
+				HistoryMarkerMenuBottomSheetDialogFragment fragment = new HistoryMarkerMenuBottomSheetDialogFragment();
+				fragment.setUsedOnMap(false);
+				Bundle arguments = new Bundle();
+				arguments.putInt(HistoryMarkerMenuBottomSheetDialogFragment.MARKER_POSITION, pos);
+				arguments.putString(HistoryMarkerMenuBottomSheetDialogFragment.MARKER_NAME, marker.getName(mapActivity));
+				arguments.putInt(HistoryMarkerMenuBottomSheetDialogFragment.MARKER_COLOR_INDEX, marker.colorIndex);
+				arguments.putLong(HistoryMarkerMenuBottomSheetDialogFragment.MARKER_VISITED_DATE, marker.visitedDate);
+				fragment.setArguments(arguments);
+				fragment.setListener(createHistoryMarkerMenuListener());
+				fragment.show(getChildFragmentManager(), HistoryMarkerMenuBottomSheetDialogFragment.TAG);
+			}
 		});
+		adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+			@Override
+			public void onChanged() {
+				changeFabVisibilityIfNeeded();
+			}
+
+			@Override
+			public void onItemRangeInserted(int positionStart, int itemCount) {
+				changeFabVisibilityIfNeeded();
+			}
+
+			@Override
+			public void onItemRangeRemoved(int positionStart, int itemCount) {
+				changeFabVisibilityIfNeeded();
+			}
+		});
+
+		final View emptyView = mainView.findViewById(R.id.empty_view);
+		mainView.findViewById(R.id.import_button).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				openAddGroupMenu();
+			}
+		});
+		ImageView emptyImageView = (ImageView) emptyView.findViewById(R.id.empty_state_image_view);
+		emptyImageView.setImageResource(night ? R.drawable.ic_empty_state_marker_group_night : R.drawable.ic_empty_state_marker_group_day);
+		recyclerView.setEmptyView(emptyView);
 		recyclerView.setAdapter(adapter);
-		return recyclerView;
+
+		mainView.findViewById(R.id.add_group_fab).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				openAddGroupMenu();
+			}
+		});
+
+		if (groupIdToOpen != null) {
+			int groupHeaderPosition = adapter.getGroupHeaderPosition(groupIdToOpen);
+			if (groupHeaderPosition != -1) {
+				((EmptyStateRecyclerView) mainView.findViewById(R.id.list)).scrollToPosition(groupHeaderPosition);
+			}
+		}
+
+		return mainView;
+	}
+
+	private HistoryMarkerMenuBottomSheetDialogFragment.HistoryMarkerMenuFragmentListener createHistoryMarkerMenuListener() {
+		return new HistoryMarkerMenuBottomSheetDialogFragment.HistoryMarkerMenuFragmentListener() {
+			@Override
+			public void onMakeMarkerActive(int pos) {
+				Object item = adapter.getItem(pos);
+				if (item instanceof MapMarker) {
+					if (getMyApplication() != null) {
+						getMyApplication().getMapMarkersHelper().restoreMarkerFromHistory((MapMarker) item, 0);
+					}
+					updateAdapter();
+				}
+			}
+
+			@Override
+			public void onDeleteMarker(int pos) {
+				Object item = adapter.getItem(pos);
+				if (item instanceof MapMarker) {
+					if (getMyApplication() != null) {
+						getMyApplication().getMapMarkersHelper().removeMarker((MapMarker) item);
+					}
+					updateAdapter();
+				}
+			}
+		};
+	}
+
+	void setGroupIdToOpen(String groupIdToOpen) {
+		this.groupIdToOpen = groupIdToOpen;
+	}
+
+	private void changeFabVisibilityIfNeeded() {
+		mainView.findViewById(R.id.add_group_fab).setVisibility(adapter.getItemCount() > 0 ? View.VISIBLE : View.GONE);
+	}
+
+	private void openAddGroupMenu() {
+		SelectionMarkersGroupBottomSheetDialogFragment fragment = new SelectionMarkersGroupBottomSheetDialogFragment();
+		fragment.setListener(createAddMarkersGroupFragmentListener());
+		fragment.setUsedOnMap(false);
+		fragment.show(getChildFragmentManager(), SelectionMarkersGroupBottomSheetDialogFragment.TAG);
+	}
+
+	private void openAddGroupMenu(AddGroupBottomSheetDialogFragment fragment) {
+		fragment.setListener(createAddGroupListener());
+		fragment.setUsedOnMap(false);
+		fragment.setRetainInstance(true);
+		fragment.show(getChildFragmentManager(), AddGroupBottomSheetDialogFragment.TAG);
+	}
+
+	private AddGroupBottomSheetDialogFragment.AddGroupListener createAddGroupListener() {
+		return new AddGroupBottomSheetDialogFragment.AddGroupListener() {
+			@Override
+			public void onGroupAdded() {
+				updateAdapter();
+			}
+		};
+	}
+
+	private AddMarkersGroupFragmentListener createAddMarkersGroupFragmentListener() {
+		return new AddMarkersGroupFragmentListener() {
+			@Override
+			public void favouritesOnClick() {
+				AddFavouritesGroupBottomSheetDialogFragment fragment = new AddFavouritesGroupBottomSheetDialogFragment();
+				openAddGroupMenu(fragment);
+			}
+
+			@Override
+			public void waypointsOnClick() {
+				AddTracksGroupBottomSheetDialogFragment fragment = new AddTracksGroupBottomSheetDialogFragment();
+				openAddGroupMenu(fragment);
+			}
+		};
 	}
 
 	void updateAdapter() {

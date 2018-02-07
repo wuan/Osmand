@@ -24,13 +24,10 @@ import net.osmand.AndroidUtils;
 import net.osmand.CallbackWithObject;
 import net.osmand.NativeLibrary.RenderedObject;
 import net.osmand.RenderingContext;
-import net.osmand.binary.BinaryMapIndexReader;
 import net.osmand.data.Amenity;
 import net.osmand.data.LatLon;
 import net.osmand.data.PointDescription;
-import net.osmand.data.QuadRect;
 import net.osmand.data.RotatedTileBox;
-import net.osmand.osm.PoiCategory;
 import net.osmand.osm.PoiFilter;
 import net.osmand.osm.PoiType;
 import net.osmand.plus.ContextMenuAdapter;
@@ -239,35 +236,20 @@ public class ContextMenuLayer extends OsmandMapLayer {
 
 	@Override
 	public void populateObjectContextMenu(LatLon latLon, Object o, ContextMenuAdapter adapter, MapActivity mapActivity) {
-		if (menu.hasHiddenBottomInfo()) {
-			ContextMenuAdapter.ItemClickListener listener = new ContextMenuAdapter.ItemClickListener() {
-				@Override
-				public boolean onContextMenuClick(ArrayAdapter<ContextMenuItem> adapter, int itemId, int pos, boolean isChecked) {
-					menu.openMenuFullScreen();
-					return true;
-				}
-			};
-			adapter.addItem(new ContextMenuItem.ItemBuilder()
-					.setTitleId(R.string.shared_string_show_description, activity)
-					.setIcon(R.drawable.ic_action_note_dark)
-					.setListener(listener)
-					.createItem());
-		}
-		if (isObjectMoveable(o)) {
-			ContextMenuAdapter.ItemClickListener listener = new ContextMenuAdapter.ItemClickListener() {
-				@Override
-				public boolean onContextMenuClick(ArrayAdapter<ContextMenuItem> adapter, int itemId, int pos, boolean isChecked) {
-					RotatedTileBox tileBox = activity.getMapView().getCurrentRotatedTileBox();
-					enterMovingMode(tileBox);
-					return true;
-				}
-			};
-			adapter.addItem(new ContextMenuItem.ItemBuilder()
-					.setTitleId(R.string.change_markers_position, activity)
-					.setIcon(R.drawable.ic_show_on_map)
-					.setListener(listener)
-					.createItem());
-		}
+		ContextMenuAdapter.ItemClickListener listener = new ContextMenuAdapter.ItemClickListener() {
+			@Override
+			public boolean onContextMenuClick(ArrayAdapter<ContextMenuItem> adapter, int itemId, int pos, boolean isChecked, int[] viewCoordinates) {
+				RotatedTileBox tileBox = activity.getMapView().getCurrentRotatedTileBox();
+				enterMovingMode(tileBox);
+				return true;
+			}
+		};
+		adapter.addItem(new ContextMenuItem.ItemBuilder()
+				.setTitleId(R.string.change_markers_position, activity)
+				.setIcon(R.drawable.ic_show_on_map)
+				.setClickable(isObjectMoveable(o))
+				.setListener(listener)
+				.createItem());
 	}
 
 	@Override
@@ -363,7 +345,7 @@ public class ContextMenuLayer extends OsmandMapLayer {
 				if (success && !cancelApplyingNewMarkerPosition) {
 					mMoveMarkerBottomSheetHelper.hide();
 					quitMovingMarker();
-
+					menu.close();
 
 					view.refreshMap();
 				}
@@ -507,7 +489,7 @@ public class ContextMenuLayer extends OsmandMapLayer {
 		view.setLatLon(lat, lon);
 
 		mInChangeMarkerPositionMode = true;
-		mMoveMarkerBottomSheetHelper.show(menu.getLeftIcon());
+		mMoveMarkerBottomSheetHelper.show(menu.getRightIcon());
 		mark(View.INVISIBLE, R.id.map_ruler_layout,
 				R.id.map_left_widgets_panel, R.id.map_right_widgets_panel, R.id.map_center_info);
 
@@ -576,7 +558,7 @@ public class ContextMenuLayer extends OsmandMapLayer {
 
 	private boolean showContextMenu(PointF point, RotatedTileBox tileBox, boolean showUnknownLocation) {
 		LatLon objectLatLon = null;
-		Map<Object, IContextMenuProvider> selectedObjects = selectObjectsForContextMenu(tileBox, point, false);
+		Map<Object, IContextMenuProvider> selectedObjects = selectObjectsForContextMenu(tileBox, point, false, showUnknownLocation);
 		NativeOsmandLibrary nativeLib = NativeOsmandLibrary.getLoadedLibrary();
 		if (nativeLib != null) {
 			MapRenderRepositories maps = activity.getMyApplication().getResourceManager().getRenderer();
@@ -622,24 +604,42 @@ public class ContextMenuLayer extends OsmandMapLayer {
 							if (entry.getKey().startsWith("name:") && !entry.getValue().equals("")) {
 								names.add(entry.getValue());
 							}
+							if (entry.getKey().equals("name") && !entry.getValue().equals("")) {
+								names.add(entry.getValue());
+							}
 						}
 						LatLon searchLatLon = objectLatLon;
 						if (searchLatLon == null) {
 							searchLatLon = tileBox.getLatLonFromPixel(point.x, point.y);
 						}
-						Amenity amenity = findAmenity(renderedObject.getId() >> 7, names, searchLatLon);
+						Amenity amenity = findAmenity(activity.getMyApplication(), renderedObject.getId() >> 7, names, searchLatLon, 50);
 						if (amenity != null) {
 							if (renderedObject.getX() != null && renderedObject.getX().size() > 1
 									&& renderedObject.getY() != null && renderedObject.getY().size() > 1) {
 								amenity.getX().addAll(renderedObject.getX());
 								amenity.getY().addAll(renderedObject.getY());
 							}
-							selectedObjects.put(amenity, poiMenuProvider);
+							boolean exists = false;
+							for (Object o : selectedObjects.keySet()) {
+								if (o instanceof Amenity && ((Amenity) o).compareTo(amenity) == 0) {
+									exists = true;
+									break;
+								}
+							}
+							if (!exists) {
+								selectedObjects.put(amenity, poiMenuProvider);
+							}
 							continue;
 						}
 						selectedObjects.put(renderedObject, null);
 					}
 				}
+			}
+		}
+		for (Map.Entry<Object, IContextMenuProvider> entry : selectedObjects.entrySet()) {
+			IContextMenuProvider provider = entry.getValue();
+			if (provider != null && provider.runExclusiveAction(entry.getKey(), showUnknownLocation)) {
+				return true;
 			}
 		}
 		if (selectedObjects.size() == 1) {
@@ -725,7 +725,8 @@ public class ContextMenuLayer extends OsmandMapLayer {
 	}
 
 	private Map<Object, IContextMenuProvider> selectObjectsForContextMenu(RotatedTileBox tileBox,
-																		  PointF point, boolean acquireObjLatLon) {
+																		  PointF point, boolean acquireObjLatLon,
+																		  boolean unknownLocation) {
 		List<LatLon> pressedLatLonFull = new ArrayList<>();
 		List<LatLon> pressedLatLonSmall = new ArrayList<>();
 		Map<Object, IContextMenuProvider> selectedObjects = new HashMap<>();
@@ -734,7 +735,7 @@ public class ContextMenuLayer extends OsmandMapLayer {
 			if (lt instanceof ContextMenuLayer.IContextMenuProvider) {
 				s.clear();
 				final IContextMenuProvider l = (ContextMenuLayer.IContextMenuProvider) lt;
-				l.collectObjectsFromPoint(point, tileBox, s);
+				l.collectObjectsFromPoint(point, tileBox, s, unknownLocation);
 				for (Object o : s) {
 					selectedObjects.put(o, l);
 					if (acquireObjLatLon && l.isObjectClickable(o)) {
@@ -817,46 +818,6 @@ public class ContextMenuLayer extends OsmandMapLayer {
 		return false;
 	}
 
-	private Amenity findAmenity(long id, List<String> names, LatLon latLon) {
-		QuadRect rect = MapUtils.calculateLatLonBbox(latLon.getLatitude(), latLon.getLongitude(), 50);
-		List<Amenity> amenities = activity.getMyApplication().getResourceManager().searchAmenities(
-				new BinaryMapIndexReader.SearchPoiTypeFilter() {
-					@Override
-					public boolean accept(PoiCategory type, String subcategory) {
-						return true;
-					}
-
-					@Override
-					public boolean isEmpty() {
-						return false;
-					}
-				}, rect.top, rect.left, rect.bottom, rect.right, -1, null);
-
-		Amenity res = null;
-		for (Amenity amenity : amenities) {
-			Long amenityId = amenity.getId() >> 1;
-			if (amenityId == id) {
-				res = amenity;
-				break;
-			}
-		}
-		if (res == null && names != null && names.size() > 0) {
-			for (Amenity amenity : amenities) {
-				for (String name : names) {
-					if (name.equals(amenity.getName())) {
-						res = amenity;
-						break;
-					}
-				}
-				if (res != null) {
-					break;
-				}
-			}
-		}
-
-		return res;
-	}
-
 	private boolean hideVisibleMenues() {
 		if (multiSelectionMenu.isVisible()) {
 			multiSelectionMenu.hide();
@@ -893,7 +854,7 @@ public class ContextMenuLayer extends OsmandMapLayer {
 		switch (event.getAction()) {
 			case MotionEvent.ACTION_DOWN:
 				if (!mInChangeMarkerPositionMode && !mInGpxDetailsMode) {
-					selectObjectsForContextMenu(tileBox, new PointF(event.getX(), event.getY()), true);
+					selectObjectsForContextMenu(tileBox, new PointF(event.getX(), event.getY()), true, true);
 					if (pressedLatLonFull.size() > 0 || pressedLatLonSmall.size() > 0) {
 						view.refreshMap();
 					}
@@ -912,7 +873,7 @@ public class ContextMenuLayer extends OsmandMapLayer {
 
 	public interface IContextMenuProvider {
 
-		void collectObjectsFromPoint(PointF point, RotatedTileBox tileBox, List<Object> o);
+		void collectObjectsFromPoint(PointF point, RotatedTileBox tileBox, List<Object> o, boolean unknownLocation);
 
 		LatLon getObjectLocation(Object o);
 
@@ -924,6 +885,7 @@ public class ContextMenuLayer extends OsmandMapLayer {
 
 		boolean isObjectClickable(Object o);
 
+		boolean runExclusiveAction(@Nullable Object o, boolean unknownLocation);
 	}
 
 	public interface IMoveObjectProvider {

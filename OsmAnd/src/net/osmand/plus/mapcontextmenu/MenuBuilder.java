@@ -3,15 +3,17 @@ package net.osmand.plus.mapcontextmenu;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.view.ContextThemeWrapper;
-import android.support.v7.widget.AppCompatButton;
 import android.text.ClipboardManager;
 import android.text.TextUtils;
 import android.text.util.Linkify;
@@ -26,24 +28,36 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import net.osmand.AndroidUtils;
 import net.osmand.binary.BinaryMapIndexReader;
 import net.osmand.data.Amenity;
+import net.osmand.data.FavouritePoint;
 import net.osmand.data.LatLon;
 import net.osmand.data.PointDescription;
 import net.osmand.data.QuadRect;
 import net.osmand.osm.PoiCategory;
+import net.osmand.plus.FavouritesDbHelper.FavoriteGroup;
+import net.osmand.plus.GPXUtilities.GPXFile;
+import net.osmand.plus.GPXUtilities.WptPt;
 import net.osmand.plus.IconsCache;
+import net.osmand.plus.OsmAndAppCustomization;
 import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.OsmandPlugin;
 import net.osmand.plus.OsmandSettings.OsmandPreference;
 import net.osmand.plus.R;
 import net.osmand.plus.activities.MapActivity;
+import net.osmand.plus.activities.TrackActivity;
+import net.osmand.plus.helpers.FontCache;
 import net.osmand.plus.mapcontextmenu.builders.cards.AbstractCard;
 import net.osmand.plus.mapcontextmenu.builders.cards.CardsRowBuilder;
 import net.osmand.plus.mapcontextmenu.builders.cards.ImageCard;
 import net.osmand.plus.mapcontextmenu.builders.cards.ImageCard.GetImageCardsTask;
 import net.osmand.plus.mapcontextmenu.builders.cards.NoImagesCard;
+import net.osmand.plus.transport.TransportStopRoute;
+import net.osmand.plus.myplaces.FavoritesActivity;
 import net.osmand.plus.render.RenderingIcons;
+import net.osmand.plus.views.TransportStopsLayer;
+import net.osmand.plus.widgets.TextViewEx;
 import net.osmand.util.Algorithms;
 import net.osmand.util.MapUtils;
 
@@ -67,6 +81,7 @@ public class MenuBuilder {
 	protected OsmandApplication app;
 	protected LinkedList<PlainMenuItem> plainMenuItems;
 	private boolean firstRow;
+	protected boolean matchWidthDivider;
 	protected boolean light;
 	private long objectId;
 	private LatLon latLon;
@@ -76,15 +91,23 @@ public class MenuBuilder {
 	private boolean showOnlinePhotos = true;
 	protected List<Amenity> nearestWiki = new ArrayList<>();
 	private List<OsmandPlugin> menuPlugins = new ArrayList<>();
+	private List<TransportStopRoute> routes = new ArrayList<>();
 	private CardsRowBuilder onlinePhotoCardsRow;
 	private List<AbstractCard> onlinePhotoCards;
+
+	private CollapseExpandListener collapseExpandListener;
 
 	private String preferredMapLang;
 	private String preferredMapAppLang;
 	private boolean transliterateNames;
 
+	public interface CollapseExpandListener {
+		void onCollapseExpand(boolean collapsed);
+	}
+
 	public class PlainMenuItem {
 		private int iconId;
+		private String buttonText;
 		private String text;
 		private boolean needLinks;
 		private boolean url;
@@ -92,10 +115,11 @@ public class MenuBuilder {
 		private CollapsableView collapsableView;
 		private OnClickListener onClickListener;
 
-		public PlainMenuItem(int iconId, String text, boolean needLinks, boolean url,
+		public PlainMenuItem(int iconId, String buttonText, String text, boolean needLinks, boolean url,
 							 boolean collapsable, CollapsableView collapsableView,
 							 OnClickListener onClickListener) {
 			this.iconId = iconId;
+			this.buttonText = buttonText;
 			this.text = text;
 			this.needLinks = needLinks;
 			this.url = url;
@@ -106,6 +130,10 @@ public class MenuBuilder {
 
 		public int getIconId() {
 			return iconId;
+		}
+
+		public String getButtonText() {
+			return buttonText;
 		}
 
 		public String getText() {
@@ -136,22 +164,22 @@ public class MenuBuilder {
 	public static class CollapsableView {
 
 		private View contenView;
+		private MenuBuilder menuBuilder;
 		private OsmandPreference<Boolean> collapsedPref;
 		private boolean collapsed;
-		private OnCollExpListener onCollExpListener;
+		private CollapseExpandListener collapseExpandListener;
 
-		public interface OnCollExpListener {
-			void onCollapseExpand(boolean collapsed);
-		}
-
-		public CollapsableView(@NonNull View contenView, @NonNull OsmandPreference<Boolean> collapsedPref) {
+		public CollapsableView(@NonNull View contenView, @NonNull MenuBuilder menuBuilder,
+							   @NonNull OsmandPreference<Boolean> collapsedPref) {
 			this.contenView = contenView;
+			this.menuBuilder = menuBuilder;
 			this.collapsedPref = collapsedPref;
 		}
 
-		public CollapsableView(@NonNull View contenView, boolean collapsed) {
+		public CollapsableView(@NonNull View contenView, @NonNull MenuBuilder menuBuilder, boolean collapsed) {
 			this.contenView = contenView;
 			this.collapsed = collapsed;
+			this.menuBuilder = menuBuilder;
 		}
 
 		public View getContenView() {
@@ -172,17 +200,20 @@ public class MenuBuilder {
 			} else {
 				this.collapsed = collapsed;
 			}
-			if (onCollExpListener != null) {
-				onCollExpListener.onCollapseExpand(collapsed);
+			if (collapseExpandListener != null) {
+				collapseExpandListener.onCollapseExpand(collapsed);
+			}
+			if (menuBuilder.collapseExpandListener != null) {
+				menuBuilder.collapseExpandListener.onCollapseExpand(collapsed);
 			}
 		}
 
-		public OnCollExpListener getOnCollExpListener() {
-			return onCollExpListener;
+		public CollapseExpandListener getCollapseExpandListener() {
+			return collapseExpandListener;
 		}
 
-		public void setOnCollExpListener(OnCollExpListener onCollExpListener) {
-			this.onCollExpListener = onCollExpListener;
+		public void setCollapseExpandListener(CollapseExpandListener collapseExpandListener) {
+			this.collapseExpandListener = collapseExpandListener;
 		}
 	}
 
@@ -197,6 +228,14 @@ public class MenuBuilder {
 			preferredMapAppLang = app.getLanguage();
 		}
 		transliterateNames = app.getSettings().MAP_TRANSLITERATE_NAMES.get();
+	}
+
+	public void setCollapseExpandListener(CollapseExpandListener collapseExpandListener) {
+		this.collapseExpandListener = collapseExpandListener;
+	}
+
+	public void setRoutes(List<TransportStopRoute> routes) {
+		this.routes = routes;
 	}
 
 	public String getPreferredMapLang() {
@@ -270,6 +309,10 @@ public class MenuBuilder {
 		if (showTitleIfTruncated) {
 			buildTitleRow(view);
 		}
+		if (showTransportRoutes()) {
+			buildRow(view, 0, null, app.getString(R.string.transport_Routes), 0, true, getCollapsableTransportStopRoutesView(view.getContext(), false),
+					false, 0, false, null, true);
+		}
 		buildNearestWikiRow(view);
 		if (needBuildPlainMenuItems()) {
 			buildPlainMenuItems(view);
@@ -279,7 +322,11 @@ public class MenuBuilder {
 			buildNearestPhotosRow(view);
 		}
 		buildPluginRows(view);
-		buildAfter(view);
+//		buildAfter(view);
+	}
+
+	private boolean showTransportRoutes() {
+		return routes.size() > 0;
 	}
 
 	void onHide() {
@@ -298,8 +345,8 @@ public class MenuBuilder {
 
 	protected void buildPlainMenuItems(View view) {
 		for (PlainMenuItem item : plainMenuItems) {
-			buildRow(view, item.getIconId(), item.getText(), 0, item.collapsable, item.collapsableView,
-					item.isNeedLinks(), 0, item.isUrl(), item.getOnClickListener());
+			buildRow(view, item.getIconId(), item.getButtonText(), item.getText(), 0, item.collapsable, item.collapsableView,
+					item.isNeedLinks(), 0, item.isUrl(), item.getOnClickListener(), false);
 		}
 	}
 
@@ -323,16 +370,16 @@ public class MenuBuilder {
 		if (mapContextMenu != null) {
 			String title = mapContextMenu.getTitleStr();
 			if (title.length() > TITLE_LIMIT) {
-				buildRow(view, R.drawable.ic_action_note_dark, title, 0, false, null, false, 0, false, null);
+				buildRow(view, R.drawable.ic_action_note_dark, null, title, 0, false, null, false, 0, false, null, false);
 			}
 		}
 	}
 
 	protected void buildNearestWikiRow(View view) {
 		if (processNearstWiki() && nearestWiki.size() > 0) {
-			buildRow(view, R.drawable.ic_action_wikipedia, app.getString(R.string.wiki_around) + " (" + nearestWiki.size()+")", 0,
+			buildRow(view, R.drawable.ic_action_wikipedia, null, app.getString(R.string.wiki_around) + " (" + nearestWiki.size()+")", 0,
 					true, getCollapsableWikiView(view.getContext(), true),
-					false, 0, false, null);
+					false, 0, false, null, false);
 		}
 	}
 
@@ -344,9 +391,9 @@ public class MenuBuilder {
 		boolean needUpdateOnly = onlinePhotoCardsRow != null && onlinePhotoCardsRow.getMenuBuilder() == this;
 		onlinePhotoCardsRow = new CardsRowBuilder(this, view, false);
 		onlinePhotoCardsRow.build();
-		CollapsableView collapsableView = new CollapsableView(onlinePhotoCardsRow.getContentView(),
+		CollapsableView collapsableView = new CollapsableView(onlinePhotoCardsRow.getContentView(), this,
 				app.getSettings().ONLINE_PHOTOS_ROW_COLLAPSED);
-		collapsableView.setOnCollExpListener(new CollapsableView.OnCollExpListener() {
+		collapsableView.setCollapseExpandListener(new CollapseExpandListener() {
 			@Override
 			public void onCollapseExpand(boolean collapsed) {
 				if (!collapsed && onlinePhotoCards == null) {
@@ -354,8 +401,8 @@ public class MenuBuilder {
 				}
 			}
 		});
-		buildRow(view, R.drawable.ic_action_photo_dark, app.getString(R.string.online_photos), 0, true,
-				collapsableView, false, 1, false, null);
+		buildRow(view, R.drawable.ic_action_photo_dark, null, app.getString(R.string.online_photos), 0, true,
+				collapsableView, false, 1, false, null, false);
 
 		if (needUpdateOnly && onlinePhotoCards != null) {
 			onlinePhotoCardsRow.setCards(onlinePhotoCards);
@@ -400,7 +447,7 @@ public class MenuBuilder {
 	}
 
 	protected void buildAfter(View view) {
-		buildRowDivider(view, false);
+		buildRowDivider(view);
 	}
 
 	public boolean isFirstRow() {
@@ -411,19 +458,19 @@ public class MenuBuilder {
 		firstRow = false;
 	}
 
-	public View buildRow(View view, int iconId, String text, int textColor,
+	public View buildRow(View view, int iconId, String buttonText, String text, int textColor,
 							boolean collapsable, final CollapsableView collapsableView,
-							boolean needLinks, int textLinesLimit, boolean isUrl, OnClickListener onClickListener) {
-		return buildRow(view, getRowIcon(iconId), text, textColor, collapsable, collapsableView,
-				needLinks, textLinesLimit, isUrl, onClickListener);
+							boolean needLinks, int textLinesLimit, boolean isUrl, OnClickListener onClickListener, boolean matchWidthDivider) {
+		return buildRow(view, iconId == 0 ? null : getRowIcon(iconId), buttonText, text, textColor, null, collapsable, collapsableView,
+				needLinks, textLinesLimit, isUrl, onClickListener, matchWidthDivider);
 	}
 
-	public View buildRow(final View view, Drawable icon, final String text, int textColor,
+	public View buildRow(final View view, Drawable icon, final String buttonText, final String text, int textColor, String secondaryText,
 							boolean collapsable, final CollapsableView collapsableView, boolean needLinks,
-							int textLinesLimit, boolean isUrl, OnClickListener onClickListener) {
+							int textLinesLimit, boolean isUrl, OnClickListener onClickListener, boolean matchWidthDivider) {
 
 		if (!isFirstRow()) {
-			buildRowDivider(view, false);
+			buildRowDivider(view);
 		}
 
 		LinearLayout baseView = new LinearLayout(view.getContext());
@@ -435,7 +482,7 @@ public class MenuBuilder {
 		ll.setOrientation(LinearLayout.HORIZONTAL);
 		LinearLayout.LayoutParams llParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 		ll.setLayoutParams(llParams);
-		ll.setBackgroundResource(resolveAttribute(view.getContext(), android.R.attr.selectableItemBackground));
+		ll.setBackgroundResource(AndroidUtils.resolveAttribute(view.getContext(), android.R.attr.selectableItemBackground));
 		ll.setOnLongClickListener(new View.OnLongClickListener() {
 			@Override
 			public boolean onLongClick(View v) {
@@ -447,38 +494,51 @@ public class MenuBuilder {
 		baseView.addView(ll);
 
 		// Icon
-		LinearLayout llIcon = new LinearLayout(view.getContext());
-		llIcon.setOrientation(LinearLayout.HORIZONTAL);
-		llIcon.setLayoutParams(new LinearLayout.LayoutParams(dpToPx(72f), dpToPx(48f)));
-		llIcon.setGravity(Gravity.CENTER_VERTICAL);
-		ll.addView(llIcon);
+		if (icon != null) {
+			LinearLayout llIcon = new LinearLayout(view.getContext());
+			llIcon.setOrientation(LinearLayout.HORIZONTAL);
+			llIcon.setLayoutParams(new LinearLayout.LayoutParams(dpToPx(64f), dpToPx(48f)));
+			llIcon.setGravity(Gravity.CENTER_VERTICAL);
+			ll.addView(llIcon);
 
-		ImageView iconView = new ImageView(view.getContext());
-		LinearLayout.LayoutParams llIconParams = new LinearLayout.LayoutParams(dpToPx(24f), dpToPx(24f));
-		llIconParams.setMargins(dpToPx(16f), dpToPx(12f), dpToPx(32f), dpToPx(12f));
-		llIconParams.gravity = Gravity.CENTER_VERTICAL;
-		iconView.setLayoutParams(llIconParams);
-		iconView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-		iconView.setImageDrawable(icon);
-		llIcon.addView(iconView);
+			ImageView iconView = new ImageView(view.getContext());
+			LinearLayout.LayoutParams llIconParams = new LinearLayout.LayoutParams(dpToPx(24f), dpToPx(24f));
+			llIconParams.setMargins(dpToPx(16f), dpToPx(12f), dpToPx(24f), dpToPx(12f));
+			llIconParams.gravity = Gravity.CENTER_VERTICAL;
+			iconView.setLayoutParams(llIconParams);
+			iconView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+			iconView.setImageDrawable(icon);
+			llIcon.addView(iconView);
+		}
 
 		// Text
 		LinearLayout llText = new LinearLayout(view.getContext());
 		llText.setOrientation(LinearLayout.VERTICAL);
+		LinearLayout.LayoutParams llTextViewParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT);
+		llTextViewParams.weight = 1f;
+		llTextViewParams.setMargins(0, 0, dpToPx(10f), 0);
+		llTextViewParams.gravity = Gravity.CENTER_VERTICAL;
+		llText.setLayoutParams(llTextViewParams);
 		ll.addView(llText);
 
-		TextView textView = new TextView(view.getContext());
+		// Primary text
+		TextViewEx textView = new TextViewEx(view.getContext());
 		LinearLayout.LayoutParams llTextParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-		llTextParams.setMargins(0, dpToPx(8f), 0, dpToPx(8f));
+		llTextParams.setMargins(icon != null ? 0 : dpToPx(16f), dpToPx(secondaryText != null ? 10f : 8f), 0, dpToPx(secondaryText != null ? 6f : 8f));
 		textView.setLayoutParams(llTextParams);
+		textView.setTypeface(FontCache.getRobotoRegular(view.getContext()));
 		textView.setTextSize(16);
-		textView.setTextColor(app.getResources().getColor(light ? R.color.ctx_menu_info_text_light : R.color.ctx_menu_info_text_dark));
+		textView.setTextColor(app.getResources().getColor(light ? R.color.ctx_menu_bottom_view_text_color_light : R.color.ctx_menu_bottom_view_text_color_dark));
+
+		int linkTextColor = ContextCompat.getColor(view.getContext(), light ? R.color.ctx_menu_bottom_view_url_color_light : R.color.ctx_menu_bottom_view_url_color_dark);
 
 		if (isUrl) {
-			textView.setTextColor(textView.getLinkTextColors());
+			textView.setTextColor(linkTextColor);
 		} else if (needLinks) {
-			textView.setAutoLinkMask(Linkify.ALL);
+			Linkify.addLinks(textView, Linkify.ALL);
 			textView.setLinksClickable(true);
+			textView.setLinkTextColor(linkTextColor);
+			AndroidUtils.removeLinkUnderline(textView);
 		}
 		if (textLinesLimit > 0) {
 			textView.setMinLines(1);
@@ -488,13 +548,34 @@ public class MenuBuilder {
 		if (textColor > 0) {
 			textView.setTextColor(view.getResources().getColor(textColor));
 		}
-
-		LinearLayout.LayoutParams llTextViewParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT);
-		llTextViewParams.weight = 1f;
-		llTextViewParams.setMargins(0, 0, dpToPx(10f), 0);
-		llTextViewParams.gravity = Gravity.CENTER_VERTICAL;
-		llText.setLayoutParams(llTextViewParams);
 		llText.addView(textView);
+
+		// Secondary text
+		if (!TextUtils.isEmpty(secondaryText)) {
+			TextViewEx textViewSecondary = new TextViewEx(view.getContext());
+			LinearLayout.LayoutParams llTextSecondaryParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+			llTextSecondaryParams.setMargins(icon != null ? 0 : dpToPx(16f), 0, 0, dpToPx(6f));
+			textViewSecondary.setLayoutParams(llTextSecondaryParams);
+			textViewSecondary.setTypeface(FontCache.getRobotoRegular(view.getContext()));
+			textViewSecondary.setTextSize(14);
+			textViewSecondary.setTextColor(app.getResources().getColor(light ? R.color.ctx_menu_bottom_view_secondary_text_color_light: R.color.ctx_menu_bottom_view_secondary_text_color_dark));
+			textViewSecondary.setText(secondaryText);
+			llText.addView(textViewSecondary);
+		}
+
+		//Button
+		if (!TextUtils.isEmpty(buttonText)) {
+			TextViewEx buttonTextView = new TextViewEx(view.getContext());
+			LinearLayout.LayoutParams buttonTextViewParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+			buttonTextViewParams.gravity = Gravity.CENTER_VERTICAL;
+			buttonTextViewParams.setMargins(dpToPx(8), 0, dpToPx(8), 0);
+			buttonTextView.setLayoutParams(buttonTextViewParams);
+			buttonTextView.setTypeface(FontCache.getRobotoMedium(view.getContext()));
+			buttonTextView.setAllCaps(true);
+			buttonTextView.setTextColor(ContextCompat.getColor(view.getContext(), !light ? R.color.ctx_menu_controller_button_text_color_dark_n : R.color.ctx_menu_controller_button_text_color_light_n));
+			buttonTextView.setText(buttonText);
+			ll.addView(buttonTextView);
+		}
 
 		final ImageView iconViewCollapse = new ImageView(view.getContext());
 		if (collapsable && collapsableView != null) {
@@ -506,30 +587,29 @@ public class MenuBuilder {
 			ll.addView(llIconCollapse);
 
 			LinearLayout.LayoutParams llIconCollapseParams = new LinearLayout.LayoutParams(dpToPx(24f), dpToPx(24f));
-			llIconCollapseParams.setMargins(0, dpToPx(12f), dpToPx(32f), dpToPx(12f));
+			llIconCollapseParams.setMargins(0, dpToPx(12f), dpToPx(24f), dpToPx(12f));
 			llIconCollapseParams.gravity = Gravity.CENTER_VERTICAL;
 			iconViewCollapse.setLayoutParams(llIconCollapseParams);
 			iconViewCollapse.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-			iconViewCollapse.setImageDrawable(app.getIconsCache().getThemedIcon(collapsableView.getContenView().getVisibility() == View.GONE ?
-					R.drawable.ic_action_arrow_down : R.drawable.ic_action_arrow_up));
+			iconViewCollapse.setImageDrawable(getCollapseIcon(collapsableView.getContenView().getVisibility() == View.GONE));
 			llIconCollapse.addView(iconViewCollapse);
 			ll.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					if (collapsableView.getContenView().getVisibility() == View.VISIBLE) {
-						collapsableView.setCollapsed(true);
 						collapsableView.getContenView().setVisibility(View.GONE);
-						iconViewCollapse.setImageDrawable(app.getIconsCache().getThemedIcon(R.drawable.ic_action_arrow_down));
+						iconViewCollapse.setImageDrawable(getCollapseIcon(true));
+						collapsableView.setCollapsed(true);
 					} else {
-						collapsableView.setCollapsed(false);
 						collapsableView.getContenView().setVisibility(View.VISIBLE);
-						iconViewCollapse.setImageDrawable(app.getIconsCache().getThemedIcon(R.drawable.ic_action_arrow_up));
+						iconViewCollapse.setImageDrawable(getCollapseIcon(false));
+						collapsableView.setCollapsed(false);
 					}
 				}
 			});
 			if (collapsableView.isCollapsed()) {
 				collapsableView.getContenView().setVisibility(View.GONE);
-				iconViewCollapse.setImageDrawable(app.getIconsCache().getThemedIcon(R.drawable.ic_action_arrow_down));
+				iconViewCollapse.setImageDrawable(getCollapseIcon(true));
 			}
 			baseView.addView(collapsableView.getContenView());
 		}
@@ -551,7 +631,13 @@ public class MenuBuilder {
 
 		rowBuilt();
 
+		setDividerWidth(matchWidthDivider);
+
 		return ll;
+	}
+
+	protected void setDividerWidth(boolean matchWidthDivider) {
+		this.matchWidthDivider = matchWidthDivider;
 	}
 
 	protected void copyToClipboard(String text, Context ctx) {
@@ -566,7 +652,7 @@ public class MenuBuilder {
 		ll.setOrientation(LinearLayout.HORIZONTAL);
 		LinearLayout.LayoutParams llParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 		ll.setLayoutParams(llParams);
-		ll.setBackgroundResource(resolveAttribute(view.getContext(), android.R.attr.selectableItemBackground));
+		ll.setBackgroundResource(AndroidUtils.resolveAttribute(view.getContext(), android.R.attr.selectableItemBackground));
 
 		// Empty
 		LinearLayout llIcon = new LinearLayout(view.getContext());
@@ -587,7 +673,7 @@ public class MenuBuilder {
 		buttonView.setPadding(dpToPx(10f), 0, dpToPx(10f), 0);
 		buttonView.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
 		//buttonView.setTextSize(view.getResources().getDimension(resolveAttribute(view.getContext(), R.dimen.default_desc_text_size)));
-		buttonView.setTextColor(view.getResources().getColor(resolveAttribute(view.getContext(), R.attr.contextMenuButtonColor)));
+		buttonView.setTextColor(view.getResources().getColor(AndroidUtils.resolveAttribute(view.getContext(), R.attr.contextMenuButtonColor)));
 		buttonView.setText(text);
 
 		if (buttonIcon != null) {
@@ -603,15 +689,15 @@ public class MenuBuilder {
 		rowBuilt();
 	}
 
-	public void buildRowDivider(View view, boolean matchWidth) {
+	public void buildRowDivider(View view) {
 		View horizontalLine = new View(view.getContext());
 		LinearLayout.LayoutParams llHorLineParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dpToPx(1f));
 		llHorLineParams.gravity = Gravity.BOTTOM;
-		if (!matchWidth) {
-			llHorLineParams.setMargins(dpToPx(72f), 0, 0, 0);
+		if (!matchWidthDivider) {
+			llHorLineParams.setMargins(dpToPx(64f), 0, 0, 0);
 		}
 		horizontalLine.setLayoutParams(llHorLineParams);
-		horizontalLine.setBackgroundColor(app.getResources().getColor(light ? R.color.ctx_menu_info_divider_light : R.color.ctx_menu_info_divider_dark));
+		horizontalLine.setBackgroundColor(app.getResources().getColor(light ? R.color.ctx_menu_bottom_view_divider_light : R.color.ctx_menu_bottom_view_divider_dark));
 		((LinearLayout) view).addView(horizontalLine);
 	}
 
@@ -623,13 +709,17 @@ public class MenuBuilder {
 	}
 
 	public void addPlainMenuItem(int iconId, String text, boolean needLinks, boolean isUrl, OnClickListener onClickListener) {
-		plainMenuItems.add(new PlainMenuItem(iconId, text, needLinks, isUrl, false, null, onClickListener));
+		plainMenuItems.add(new PlainMenuItem(iconId, null, text, needLinks, isUrl, false, null, onClickListener));
+	}
+
+	public void addPlainMenuItem(int iconId, String buttonText, String text, boolean needLinks, boolean isUrl, OnClickListener onClickListener) {
+		plainMenuItems.add(new PlainMenuItem(iconId, buttonText, text, needLinks, isUrl, false, null, onClickListener));
 	}
 
 	public void addPlainMenuItem(int iconId, String text, boolean needLinks, boolean isUrl,
 								 boolean collapsable, CollapsableView collapsableView,
 								 OnClickListener onClickListener) {
-		plainMenuItems.add(new PlainMenuItem(iconId, text, needLinks, isUrl, collapsable, collapsableView, onClickListener));
+		plainMenuItems.add(new PlainMenuItem(iconId, null, text, needLinks, isUrl, collapsable, collapsableView, onClickListener));
 	}
 
 	public void clearPlainMenuItems() {
@@ -638,25 +728,17 @@ public class MenuBuilder {
 
 	public Drawable getRowIcon(int iconId) {
 		IconsCache iconsCache = app.getIconsCache();
-		return iconsCache.getIcon(iconId,
-				light ? R.color.icon_color : R.color.icon_color_light);
+		return iconsCache.getIcon(iconId, light ? R.color.ctx_menu_bottom_view_icon_light : R.color.ctx_menu_bottom_view_icon_dark);
 	}
 
 	public Drawable getRowIcon(Context ctx, String fileName) {
 		Drawable d = RenderingIcons.getBigIcon(ctx, fileName);
 		if (d != null) {
-			d.setColorFilter(app.getResources()
-					.getColor(light ? R.color.icon_color : R.color.icon_color_light), PorterDuff.Mode.SRC_IN);
+			d.setColorFilter(app.getResources().getColor(light ? R.color.ctx_menu_bottom_view_icon_light : R.color.ctx_menu_bottom_view_icon_dark), PorterDuff.Mode.SRC_IN);
 			return d;
 		} else {
 			return null;
 		}
-	}
-
-	public int resolveAttribute(Context ctx, int attribute) {
-		TypedValue outValue = new TypedValue();
-		ctx.getTheme().resolveAttribute(attribute, outValue, true);
-		return outValue.resourceId;
 	}
 
 	public int dpToPx(float dp) {
@@ -668,53 +750,199 @@ public class MenuBuilder {
 		);
 	}
 
+	public Drawable getCollapseIcon(boolean collapsed) {
+		return app.getIconsCache().getIcon(collapsed ? R.drawable.ic_action_arrow_down : R.drawable.ic_action_arrow_up,
+				light ? R.color.ctx_menu_collapse_icon_color_light : R.color.ctx_menu_collapse_icon_color_dark);
+	}
+
+	private View buildTransportRowItem(View view, TransportStopRoute route, OnClickListener listener) {
+		LinearLayout baseView = new LinearLayout(view.getContext());
+		baseView.setOrientation(LinearLayout.HORIZONTAL);
+		LinearLayout.LayoutParams llBaseViewParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		baseView.setLayoutParams(llBaseViewParams);
+		baseView.setPadding(dpToPx(16), 0, dpToPx(16), dpToPx(12));
+		baseView.setBackgroundResource(AndroidUtils.resolveAttribute(view.getContext(), android.R.attr.selectableItemBackground));
+
+		TextViewEx transportRect = new TextViewEx(view.getContext());
+		LinearLayout.LayoutParams trParams = new LinearLayout.LayoutParams(dpToPx(32), dpToPx(18));
+		trParams.setMargins(0, dpToPx(16), 0, 0);
+		transportRect.setLayoutParams(trParams);
+		transportRect.setGravity(Gravity.CENTER);
+		transportRect.setAllCaps(true);
+		transportRect.setTypeface(FontCache.getRobotoMedium(view.getContext()));
+		transportRect.setTextColor(Color.WHITE);
+		transportRect.setTextSize(10);
+
+		GradientDrawable shape = new GradientDrawable();
+		shape.setShape(GradientDrawable.RECTANGLE);
+		shape.setCornerRadius(dpToPx(3));
+		shape.setColor(route.getColor(mapActivity.getMyApplication(), !light));
+
+		transportRect.setBackgroundDrawable(shape);
+		transportRect.setText(route.route.getRef());
+		baseView.addView(transportRect);
+
+		LinearLayout infoView = new LinearLayout(view.getContext());
+		infoView.setOrientation(LinearLayout.VERTICAL);
+		LinearLayout.LayoutParams infoViewLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+		infoViewLayoutParams.setMargins(dpToPx(16), dpToPx(12), dpToPx(16), 0);
+		infoView.setLayoutParams(infoViewLayoutParams);
+		baseView.addView(infoView);
+
+		TextView titleView = new TextView(view.getContext());
+		LinearLayout.LayoutParams titleParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+		titleView.setLayoutParams(titleParams);
+		titleView.setTextSize(16);
+		titleView.setTextColor(app.getResources().getColor(light ? R.color.ctx_menu_bottom_view_text_color_light : R.color.ctx_menu_bottom_view_text_color_dark));
+		titleView.setText(route.getDescription(getMapActivity().getMyApplication(), true));
+		infoView.addView(titleView);
+
+		LinearLayout typeView = new LinearLayout(view.getContext());
+		typeView.setOrientation(LinearLayout.HORIZONTAL);
+		LinearLayout.LayoutParams typeViewParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+		typeViewParams.setMargins(0, dpToPx(8), 0, 0);
+		typeView.setGravity(Gravity.CENTER);
+		typeView.setLayoutParams(typeViewParams);
+		infoView.addView(typeView);
+
+		ImageView typeImageView = new ImageView(view.getContext());
+		LinearLayout.LayoutParams typeImageParams = new LinearLayout.LayoutParams(dpToPx(16), dpToPx(16));
+		typeImageParams.setMargins(dpToPx(4), 0, dpToPx(4), 0);
+		typeImageView.setLayoutParams(typeImageParams);
+		int drawableResId = route.type == null ? R.drawable.ic_action_polygom_dark : route.type.getResourceId();
+		typeImageView.setImageDrawable(getRowIcon(drawableResId));
+		typeView.addView(typeImageView);
+
+		TextView typeTextView = new TextView(view.getContext());
+		LinearLayout.LayoutParams typeTextParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+		typeTextView.setLayoutParams(typeTextParams);
+		typeTextView.setText(route.getTypeStrRes());
+		AndroidUtils.setTextSecondaryColor(getMapActivity(), typeTextView, getApplication().getDaynightHelper().isNightModeForMapControls());
+		typeView.addView(typeTextView);
+
+		baseView.setOnClickListener(listener);
+
+		((ViewGroup) view).addView(baseView);
+
+		return baseView;
+	}
+
+	private void buildTransportRouteRow(ViewGroup parent, TransportStopRoute r, OnClickListener listener, boolean showDivider) {
+		buildTransportRowItem(parent, r, listener);
+
+		if (showDivider) {
+			buildRowDivider(parent);
+		}
+	}
+
+	private CollapsableView getCollapsableTransportStopRoutesView(final Context context, boolean collapsed) {
+		LinearLayout view = (LinearLayout) buildCollapsableContentView(context, collapsed, false);
+
+		for (int i = 0; i < routes.size(); i++) {
+			final TransportStopRoute r  = routes.get(i);
+			View.OnClickListener listener = new View.OnClickListener() {
+				@Override
+				public void onClick(View arg0) {
+					MapContextMenu mm = getMapActivity().getContextMenu();
+					PointDescription pd = new PointDescription(PointDescription.POINT_TYPE_TRANSPORT_ROUTE,
+							r.getDescription(getMapActivity().getMyApplication(), false));
+					mm.show(latLon, pd, r);
+					TransportStopsLayer stopsLayer = getMapActivity().getMapLayers().getTransportStopsLayer();
+					stopsLayer.setRoute(r);
+					int cz = r.calculateZoom(0, getMapActivity().getMapView().getCurrentRotatedTileBox());
+					getMapActivity().changeZoom(cz - getMapActivity().getMapView().getZoom());
+				}
+			};
+			boolean showDivider = i < routes.size() - 1;
+			buildTransportRouteRow(view, r, listener, showDivider);
+		}
+
+		return new CollapsableView(view, this, collapsed);
+	}
+
 	protected CollapsableView getCollapsableTextView(Context context, boolean collapsed, String text) {
-		final TextView textView = new TextView(context);
+		final TextViewEx textView = new TextViewEx(context);
 		textView.setVisibility(collapsed ? View.GONE : View.VISIBLE);
 		LinearLayout.LayoutParams llTextDescParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-		llTextDescParams.setMargins(dpToPx(72f), 0, dpToPx(40f), dpToPx(13f));
+		llTextDescParams.setMargins(dpToPx(64f), 0, dpToPx(40f), dpToPx(13f));
 		textView.setLayoutParams(llTextDescParams);
+		textView.setTypeface(FontCache.getRobotoRegular(context));
 		textView.setTextSize(16);
-		textView.setTextColor(app.getResources().getColor(light ? R.color.ctx_menu_info_text_light : R.color.ctx_menu_info_text_dark));
+		textView.setTextColor(app.getResources().getColor(light ? R.color.ctx_menu_bottom_view_text_color_light : R.color.ctx_menu_bottom_view_text_color_dark));
 		textView.setText(text);
-		return new CollapsableView(textView, collapsed);
+		return new CollapsableView(textView, this, collapsed);
 	}
 
 	protected CollapsableView getCollapsableWikiView(Context context, boolean collapsed) {
+		LinearLayout view = (LinearLayout) buildCollapsableContentView(context, collapsed, true);
+
+		for (final Amenity wiki : nearestWiki) {
+			TextViewEx button = buildButtonInCollapsableView(context, false, false);
+			String name = wiki.getName(preferredMapAppLang, transliterateNames);
+			button.setText(name);
+
+			button.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					LatLon latLon = new LatLon(wiki.getLocation().getLatitude(), wiki.getLocation().getLongitude());
+					PointDescription pointDescription = mapActivity.getMapLayers().getPoiMapLayer().getObjectName(wiki);
+					mapActivity.getContextMenu().show(latLon, pointDescription, wiki);
+				}
+			});
+			view.addView(button);
+		}
+
+		return new CollapsableView(view, this, collapsed);
+	}
+
+	protected LinearLayout buildCollapsableContentView(Context context, boolean collapsed, boolean needMargin) {
 		final LinearLayout view = new LinearLayout(context);
 		view.setOrientation(LinearLayout.VERTICAL);
 		view.setVisibility(collapsed ? View.GONE : View.VISIBLE);
 		LinearLayout.LayoutParams llParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-		llParams.setMargins(dpToPx(68f), 0, dpToPx(12f), dpToPx(13f));
-		view.setLayoutParams(llParams);
-
-		for (final Amenity wiki : nearestWiki) {
-			AppCompatButton wikiButton = new AppCompatButton(
-					new ContextThemeWrapper(view.getContext(), light ? R.style.OsmandLightTheme : R.style.OsmandDarkTheme));
-			LinearLayout.LayoutParams llWikiButtonParams =
-					new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-			wikiButton.setLayoutParams(llWikiButtonParams);
-			wikiButton.setPadding(dpToPx(14f), 0, dpToPx(14f), 0);
-			wikiButton.setTextColor(app.getResources()
-					.getColor(light ? R.color.color_dialog_buttons_light : R.color.color_dialog_buttons_dark));
-			wikiButton.setText(wiki.getName(preferredMapAppLang, transliterateNames));
-
-			wikiButton.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
-			wikiButton.setSingleLine(true);
-			wikiButton.setEllipsize(TextUtils.TruncateAt.END);
-			wikiButton.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					PointDescription pointDescription = mapActivity.getMapLayers().getPoiMapLayer().getObjectName(wiki);
-					mapActivity.getContextMenu().show(
-							new LatLon(wiki.getLocation().getLatitude(), wiki.getLocation().getLongitude()),
-							pointDescription, wiki);
-				}
-			});
-			view.addView(wikiButton);
+		if (needMargin) {
+			llParams.setMargins(dpToPx(64f), 0, dpToPx(12f), 0);
 		}
+		view.setLayoutParams(llParams);
+		return view;
+	}
 
-		return new CollapsableView(view, collapsed);
+	protected TextViewEx buildButtonInCollapsableView(Context context, boolean selected, boolean showAll) {
+		return buildButtonInCollapsableView(context, selected, showAll, true);
+	}
+
+	protected TextViewEx buildButtonInCollapsableView(Context context, boolean selected, boolean showAll, boolean singleLine) {
+		TextViewEx button = new TextViewEx(new ContextThemeWrapper(context, light ? R.style.OsmandLightTheme : R.style.OsmandDarkTheme));
+		LinearLayout.LayoutParams llWikiButtonParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+		llWikiButtonParams.setMargins(0, 0, 0, dpToPx(8f));
+		//button.setMinimumHeight(dpToPx(36f));
+		button.setLayoutParams(llWikiButtonParams);
+		button.setTypeface(FontCache.getRobotoRegular(context));
+		int bg;
+		if (selected) {
+			bg = light ? R.drawable.context_menu_controller_bg_light_selected: R.drawable.context_menu_controller_bg_dark_selected;
+		} else if (showAll) {
+			bg = light ? R.drawable.context_menu_controller_bg_light_show_all : R.drawable.context_menu_controller_bg_dark_show_all;
+		} else {
+			bg = light ? R.drawable.context_menu_controller_bg_light : R.drawable.context_menu_controller_bg_dark;
+		}
+		button.setBackgroundResource(bg);
+		button.setTextSize(14);
+		int paddingSides = dpToPx(10f);
+		button.setPadding(paddingSides, paddingSides, paddingSides, paddingSides);
+		if (!selected) {
+			ColorStateList buttonColorStateList = AndroidUtils.createColorStateList(context, !light,
+					R.color.ctx_menu_controller_button_text_color_light_n, R.color.ctx_menu_controller_button_text_color_light_p,
+					R.color.ctx_menu_controller_button_text_color_dark_n, R.color.ctx_menu_controller_button_text_color_dark_p);
+			button.setTextColor(buttonColorStateList);
+		} else {
+			button.setTextColor(ContextCompat.getColor(context, light ? R.color.ctx_menu_bottom_view_text_color_light : R.color.ctx_menu_bottom_view_text_color_dark));
+		}
+		button.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
+		button.setSingleLine(singleLine);
+		button.setEllipsize(TextUtils.TruncateAt.END);
+
+		return button;
 	}
 
 	protected boolean processNearstWiki() {
