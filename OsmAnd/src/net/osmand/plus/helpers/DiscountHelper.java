@@ -37,9 +37,11 @@ public class DiscountHelper {
 	private static String mDescription;
 	private static String mIcon;
 	private static String mUrl;
+	private static String mTravelUrl;
 	private static boolean mBannerVisible;
 	private static final String URL = "https://osmand.net/api/motd";
 	private static final String INAPP_PREFIX = "osmand-in-app:";
+	private static final String TRAVEL_PREFIX = "travel:";
 
 
 	public static void checkAndDisplay(final MapActivity mapActivity) {
@@ -49,7 +51,7 @@ public class DiscountHelper {
 			return;
 		}
 		if (mBannerVisible) {
-			showDiscountBanner(mapActivity, mTitle, mDescription, mIcon, mUrl);
+			showDiscountBanner(mapActivity, mTitle, mDescription, mIcon, mUrl,mTravelUrl);
 		}
 		if (System.currentTimeMillis() - mLastCheckTime < 1000 * 60 * 60 * 24
 				|| !settings.isInternetConnectionAvailable()
@@ -84,6 +86,24 @@ public class DiscountHelper {
 			@Override
 			protected void onPostExecute(String response) {
 				if (response != null) {
+					response = "{\n" +
+							"  \"message\" : \"Unlimited map downloads -50%!\",\n" +
+							"  \"description\" : \"Get Ready for Summer!\",\n" +
+							"  \"start\" : \"24-05-2018 00:00\",\n" +
+							"  \"end\" : \"29-05-2018 23:59\",\n" +
+							"  \"show_start_frequency\" : 300,\n" +
+							"  \"show_day_frequency\" : 100,\n" +
+							"  \"max_total_show\" : 100,\n" +
+							"  \"icon\" : \"ic_action_gift\",\n" +
+							"  \"url\" : \"osmand-in-app:osmand_full_version_price\",\n" +
+							"  \"url_1\" :  \"osmand-market-app:net.osmand.plus\",\n" +
+							"  \"url_2\" : \"osmand-in-app:osmand_full_version_price\",\n" +
+							"  \"url_3\" : \"osmand-in-app:osm_live_subscription_2,osm_free_live_subscription_2\",\n" +
+							"  \"travel\" : \"travel:kiev\",\n" +
+							"  \"application\" : {\n" +
+							"    \"net.osmand\" : true\n" +
+							"  }\n" +
+							"}";
 					processDiscountResponse(response, mapActivity);
 				}
 			}
@@ -100,6 +120,7 @@ public class DiscountHelper {
 			String description = obj.getString("description");
 			String icon = obj.getString("icon");
 			String url = parseUrl(app, obj.getString("url"));
+			String travelUrl = parseUrl(app, obj.getString("travel"));
 			SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm");
 			Date start = df.parse(obj.getString("start"));
 			Date end = df.parse(obj.getString("end"));
@@ -136,7 +157,7 @@ public class DiscountHelper {
 						settings.DISCOUNT_TOTAL_SHOW.set(settings.DISCOUNT_TOTAL_SHOW.get() + 1);
 						settings.DISCOUNT_SHOW_NUMBER_OF_STARTS.set(app.getAppInitializer().getNumberOfStarts());
 						settings.DISCOUNT_SHOW_DATETIME_MS.set(System.currentTimeMillis());
-						showDiscountBanner(mapActivity, message, description, icon, url);	
+						showDiscountBanner(mapActivity, message, description, icon, url,travelUrl);
 					}
 				}
 			}
@@ -167,7 +188,7 @@ public class DiscountHelper {
 	}
 
 	private static void showDiscountBanner(final MapActivity mapActivity, final String title,
-										   final String description, final String icon, final String url) {
+										   final String description, final String icon, final String url, final  String travelUrl) {
 		final DiscountBarController toolbarController = new DiscountBarController();
 		toolbarController.setTitle(title);
 		toolbarController.setDescription(description);
@@ -197,8 +218,8 @@ public class DiscountHelper {
 			@Override
 			public void onClick(View v) {
 				mapActivity.getMyApplication().logEvent(mapActivity, "motd_close");
-				mBannerVisible = false;
-				mapActivity.hideTopToolbar(toolbarController);
+//				mBannerVisible = false;
+				openUrl(mapActivity, travelUrl);
 			}
 		});
 
@@ -206,6 +227,7 @@ public class DiscountHelper {
 		mDescription = description;
 		mIcon = icon;
 		mUrl = url;
+		mTravelUrl = travelUrl;
 		mBannerVisible = true;
 
 		mapActivity.showTopToolbar(toolbarController);
@@ -223,6 +245,12 @@ public class DiscountHelper {
 			} else if (url.contains(InAppPurchaseHelper.SKU_LIVE_UPDATES)){
 				ChoosePlanDialogFragment.showOsmLiveInstance(mapActivity.getSupportFragmentManager());
 			}
+		} else if(url.startsWith("travel")) {
+			Intent intent = new Intent(Intent.ACTION_VIEW);
+			intent.setData(Uri.parse(url));
+			intent.putExtra("city_id_key", 10130L);
+			intent.putExtra("selected_lang_key","en");
+			mapActivity.startActivity(intent);
 		} else {
 			Intent intent = new Intent(Intent.ACTION_VIEW);
 			intent.setData(Uri.parse(url));
