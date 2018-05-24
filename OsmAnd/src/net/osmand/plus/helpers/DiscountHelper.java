@@ -18,6 +18,7 @@ import net.osmand.plus.chooseplan.ChoosePlanDialogFragment;
 import net.osmand.plus.inapp.InAppPurchaseHelper;
 import net.osmand.plus.views.mapwidgets.MapInfoWidgetsFactory.TopToolbarController;
 import net.osmand.plus.views.mapwidgets.MapInfoWidgetsFactory.TopToolbarControllerType;
+import net.osmand.plus.wikipedia.WikiArticleHelper;
 import net.osmand.util.Algorithms;
 
 import org.json.JSONObject;
@@ -38,6 +39,7 @@ public class DiscountHelper {
 	private static String mIcon;
 	private static String mUrl;
 	private static String mTravelUrl;
+	private static String mLang;
 	private static boolean mBannerVisible;
 	private static final String URL = "https://osmand.net/api/motd";
 	private static final String INAPP_PREFIX = "osmand-in-app:";
@@ -51,7 +53,7 @@ public class DiscountHelper {
 			return;
 		}
 		if (mBannerVisible) {
-			showDiscountBanner(mapActivity, mTitle, mDescription, mIcon, mUrl,mTravelUrl);
+			showDiscountBanner(mapActivity, mTitle, mDescription, mIcon, mUrl, mTravelUrl, mLang);
 		}
 		if (System.currentTimeMillis() - mLastCheckTime < 1000 * 60 * 60 * 24
 				|| !settings.isInternetConnectionAvailable()
@@ -99,7 +101,8 @@ public class DiscountHelper {
 							"  \"url_1\" :  \"osmand-market-app:net.osmand.plus\",\n" +
 							"  \"url_2\" : \"osmand-in-app:osmand_full_version_price\",\n" +
 							"  \"url_3\" : \"osmand-in-app:osm_live_subscription_2,osm_free_live_subscription_2\",\n" +
-							"  \"travel\" : \"travel:kiev\",\n" +
+							"  \"travel\" : \"travel:World%20Cup%202018\",\n" +
+							"  \"lang\" : \"en\",\n" +
 							"  \"application\" : {\n" +
 							"    \"net.osmand\" : true\n" +
 							"  }\n" +
@@ -121,6 +124,7 @@ public class DiscountHelper {
 			String icon = obj.getString("icon");
 			String url = parseUrl(app, obj.getString("url"));
 			String travelUrl = parseUrl(app, obj.getString("travel"));
+			String lang = parseUrl(app, obj.getString("lang"));
 			SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm");
 			Date start = df.parse(obj.getString("start"));
 			Date end = df.parse(obj.getString("end"));
@@ -129,38 +133,38 @@ public class DiscountHelper {
 			int maxTotalShow = obj.getInt("max_total_show");
 			JSONObject application = obj.getJSONObject("application");
 
-			if (url.startsWith(INAPP_PREFIX) && url.length() > INAPP_PREFIX.length()) {
-				String inAppSku = url.substring(INAPP_PREFIX.length());
-				InAppPurchaseHelper purchaseHelper = app.getInAppPurchaseHelper();
-				if (purchaseHelper != null
-						&& (purchaseHelper.isPurchased(inAppSku) || InAppPurchaseHelper.isSubscribedToLiveUpdates(app))) {
-					return;
-				}
-			}
+//			if (url.startsWith(INAPP_PREFIX) && url.length() > INAPP_PREFIX.length()) {
+//				String inAppSku = url.substring(INAPP_PREFIX.length());
+//				InAppPurchaseHelper purchaseHelper = app.getInAppPurchaseHelper();
+//				if (purchaseHelper != null
+//						&& (purchaseHelper.isPurchased(inAppSku) || InAppPurchaseHelper.isSubscribedToLiveUpdates(app))) {
+//					return;
+//				}
+//			}
 
 			String appName = app.getPackageName();
 			Date date = new Date();
-			if (application.has(appName) && application.getBoolean(appName)
-					&& date.after(start) && date.before(end)) {
-
-				OsmandSettings settings = app.getSettings();
-				int discountId = getDiscountId(message, description, start, end);
-				boolean discountChanged = settings.DISCOUNT_ID.get() != discountId;
-				if (discountChanged) {
-					settings.DISCOUNT_TOTAL_SHOW.set(0);
-				}
-				if (discountChanged
-						|| app.getAppInitializer().getNumberOfStarts() - settings.DISCOUNT_SHOW_NUMBER_OF_STARTS.get() >= showStartFrequency
-						|| System.currentTimeMillis() - settings.DISCOUNT_SHOW_DATETIME_MS.get() > 1000L * 60 * 60 * 24 * showDayFrequency) {
-					if(settings.DISCOUNT_TOTAL_SHOW.get() < maxTotalShow){
-						settings.DISCOUNT_ID.set(discountId);
-						settings.DISCOUNT_TOTAL_SHOW.set(settings.DISCOUNT_TOTAL_SHOW.get() + 1);
-						settings.DISCOUNT_SHOW_NUMBER_OF_STARTS.set(app.getAppInitializer().getNumberOfStarts());
-						settings.DISCOUNT_SHOW_DATETIME_MS.set(System.currentTimeMillis());
-						showDiscountBanner(mapActivity, message, description, icon, url,travelUrl);
-					}
-				}
-			}
+//			if (application.has(appName) && application.getBoolean(appName)
+//					&& date.after(start) && date.before(end)) {
+//
+//				OsmandSettings settings = app.getSettings();
+//				int discountId = getDiscountId(message, description, start, end);
+//				boolean discountChanged = settings.DISCOUNT_ID.get() != discountId;
+//				if (discountChanged) {
+//					settings.DISCOUNT_TOTAL_SHOW.set(0);
+//				}
+//				if (discountChanged
+//						|| app.getAppInitializer().getNumberOfStarts() - settings.DISCOUNT_SHOW_NUMBER_OF_STARTS.get() >= showStartFrequency
+//						|| System.currentTimeMillis() - settings.DISCOUNT_SHOW_DATETIME_MS.get() > 1000L * 60 * 60 * 24 * showDayFrequency) {
+//					if(settings.DISCOUNT_TOTAL_SHOW.get() < maxTotalShow){
+//						settings.DISCOUNT_ID.set(discountId);
+//						settings.DISCOUNT_TOTAL_SHOW.set(settings.DISCOUNT_TOTAL_SHOW.get() + 1);
+//						settings.DISCOUNT_SHOW_NUMBER_OF_STARTS.set(app.getAppInitializer().getNumberOfStarts());
+//						settings.DISCOUNT_SHOW_DATETIME_MS.set(System.currentTimeMillis());
+			showDiscountBanner(mapActivity, message, description, icon, url, travelUrl, lang);
+//					}
+//				}
+//			}
 		} catch (Exception e) {
 			logError("JSON parsing error: ", e);
 		}
@@ -187,8 +191,8 @@ public class DiscountHelper {
 		return result;
 	}
 
-	private static void showDiscountBanner(final MapActivity mapActivity, final String title,
-										   final String description, final String icon, final String url, final  String travelUrl) {
+	private static void showDiscountBanner(final MapActivity mapActivity, final String title, final String description,
+	                                       final String icon, final String url, final String travelUrl, final String lang) {
 		final DiscountBarController toolbarController = new DiscountBarController();
 		toolbarController.setTitle(title);
 		toolbarController.setDescription(description);
@@ -199,18 +203,18 @@ public class DiscountHelper {
 				@Override
 				public void onClick(View v) {
 					mapActivity.getMyApplication().logEvent(mapActivity, "motd_click");
-					mBannerVisible = false;
-					mapActivity.hideTopToolbar(toolbarController);
-					openUrl(mapActivity, url);
+//					mBannerVisible = false;
+//					mapActivity.hideTopToolbar(toolbarController);
+					openUrl(mapActivity, url, lang);
 				}
 			});
 			toolbarController.setOnTitleClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					mapActivity.getMyApplication().logEvent(mapActivity, "motd_click");
-					mBannerVisible = false;
-					mapActivity.hideTopToolbar(toolbarController);
-					openUrl(mapActivity, url);
+//					mBannerVisible = false;
+//					mapActivity.hideTopToolbar(toolbarController);
+					openUrl(mapActivity, url, lang);
 				}
 			});
 		}
@@ -219,7 +223,7 @@ public class DiscountHelper {
 			public void onClick(View v) {
 				mapActivity.getMyApplication().logEvent(mapActivity, "motd_close");
 //				mBannerVisible = false;
-				openUrl(mapActivity, travelUrl);
+				openUrl(mapActivity, travelUrl, lang);
 			}
 		});
 
@@ -228,12 +232,13 @@ public class DiscountHelper {
 		mIcon = icon;
 		mUrl = url;
 		mTravelUrl = travelUrl;
+		mLang = lang;
 		mBannerVisible = true;
 
 		mapActivity.showTopToolbar(toolbarController);
 	}
 
-	private static void openUrl(final MapActivity mapActivity, String url) {
+	private static void openUrl(final MapActivity mapActivity, String url, String lang) {
 		if (url.startsWith(INAPP_PREFIX)) {
 			if (url.contains(InAppPurchaseHelper.SKU_FULL_VERSION_PRICE)) {
 				OsmandApplication app = mapActivity.getMyApplication();
@@ -245,12 +250,11 @@ public class DiscountHelper {
 			} else if (url.contains(InAppPurchaseHelper.SKU_LIVE_UPDATES)){
 				ChoosePlanDialogFragment.showOsmLiveInstance(mapActivity.getSupportFragmentManager());
 			}
-		} else if(url.startsWith("travel")) {
-			Intent intent = new Intent(Intent.ACTION_VIEW);
-			intent.setData(Uri.parse(url));
-			intent.putExtra("city_id_key", 10130L);
-			intent.putExtra("selected_lang_key","en");
-			mapActivity.startActivity(intent);
+		} else if (url.startsWith(TRAVEL_PREFIX)) {
+			Intent intent = new Intent(Intent.ACTION_SEND);
+			intent.putExtra(Intent.EXTRA_TEXT, WikiArticleHelper.buildTravelUrl(url, lang));
+			intent.setType("text/plain");
+			mapActivity.startActivity(Intent.createChooser(intent, mapActivity.getString(R.string.share_article)));
 		} else {
 			Intent intent = new Intent(Intent.ACTION_VIEW);
 			intent.setData(Uri.parse(url));

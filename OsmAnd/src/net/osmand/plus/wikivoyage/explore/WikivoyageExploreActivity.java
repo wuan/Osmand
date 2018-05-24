@@ -3,6 +3,7 @@ package net.osmand.plus.wikivoyage.explore;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -168,15 +169,31 @@ public class WikivoyageExploreActivity extends TabActivity implements DownloadEv
 		super.onResume();
 		Intent intent = getIntent();
 		if (intent != null) {
-			int currentItem = intent.getIntExtra(TAB_SELECTED, 0);
-			if (currentItem == SAVED_ARTICLES_POSITION) {
-				BottomNavigationView bottomNav = (BottomNavigationView) findViewById(R.id.bottom_navigation);
-				bottomNav.setSelectedItemId(R.id.action_saved_articles);
+			long articleId = -1;
+			String selectedLang = "";
+			if (intent.getData() != null) {
+				Uri data = intent.getData();
+				if (("http".equalsIgnoreCase(data.getScheme()) || "https".equalsIgnoreCase(data.getScheme()))
+						&& data.getHost() != null
+						&& data.getPath() != null
+						&& data.getPath().startsWith("/travel")
+						&& data.getHost().contains("osmand.net")) {
+					String query = data.getQueryParameter("query");
+					selectedLang = data.getQueryParameter("lang");
+					TravelDbHelper helper = getMyApplication().getTravelDbHelper();
+					articleId = helper.getArticleId(query, selectedLang);
+				}
+			} else {
+				int currentItem = intent.getIntExtra(TAB_SELECTED, 0);
+				if (currentItem == SAVED_ARTICLES_POSITION) {
+					BottomNavigationView bottomNav = (BottomNavigationView) findViewById(R.id.bottom_navigation);
+					bottomNav.setSelectedItemId(R.id.action_saved_articles);
+				}
+				articleId = intent.getLongExtra(CITY_ID_KEY, -1);
+				selectedLang = intent.getStringExtra(SELECTED_LANG_KEY);
 			}
-			long cityId = intent.getLongExtra(CITY_ID_KEY, -1);
-			String selectedLang = intent.getStringExtra(SELECTED_LANG_KEY);
-			if (cityId != -1) {
-				WikivoyageArticleDialogFragment.showInstance(app, getSupportFragmentManager(), cityId, selectedLang);
+			if (articleId != -1 && articleId != 0) {
+				WikivoyageArticleDialogFragment.showInstance(app, getSupportFragmentManager(), articleId, selectedLang);
 			}
 			setIntent(null);
 		}
